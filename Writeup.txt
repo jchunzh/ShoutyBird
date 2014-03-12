@@ -1,0 +1,9 @@
+Plan:
+-Create functional prototype using WPF, MVVM Light
+	-Success criteria:
+		-Copter rises with sound, falls with silence
+		-Copter position on screen corresponds with position in game logic
+		-Copter collides with pipes
+		-World scrolls
+-Refactor game logic and abstract display information
+-Port to Windows Phone

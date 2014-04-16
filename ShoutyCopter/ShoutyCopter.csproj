@@ -65,7 +65,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="GameUnitsToDIsplayUnitsConverter.cs" />
+    <Compile Include="Converters\GameUnitsToDIsplayUnitsConverter.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />

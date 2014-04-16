@@ -25,11 +25,15 @@ namespace ShoutyCopter.ViewModel
         private const float Gravity = 1000f;
         //Time between ticks in milliseconds
         private const double TimerTick = 10d;
-        private readonly Timer _worldTimer;
+
         /// <summary>
         /// in milliseconds
         /// </summary>
         private double _time;
+
+        private double _scaleFactor;
+        private double _width;
+        private double _height;
 
         public Vector Position
         {
@@ -41,31 +45,54 @@ namespace ShoutyCopter.ViewModel
                 RaisePropertyChanged("Position");
             }
         }
+
+        public double ScaleFactor
+        {
+            get { return _scaleFactor; }
+            set
+            {
+                if (_scaleFactor == value) return;   
+                _scaleFactor = value;
+                RaisePropertyChanged("ScaleFactor");
+            }
+        }
+
+        public double Width
+        {
+            get { return _width; }
+            set
+            {
+                if (_width == value) return;
+                _width = value;
+                RaisePropertyChanged("Width");
+            }
+        }
+
+        public double Height
+        {
+            get { return _height; }
+            set
+            {
+                if (_height == value) return;
+                _height = value;
+                RaisePropertyChanged("Height");
+            }
+        }
+
         public RelayCommand<KeyEventArgs> Move { get; private set; }
 
         public MainViewModel()
         {
             Position = new Vector { X = 0, Y = 0 };
-            _worldTimer = new Timer(TimerTick);
-            _worldTimer.AutoReset = true;
-            _worldTimer.Elapsed += Tick;
-            _worldTimer.Enabled = true;
-
+            Width = 1;
+            Height = 1;
+            Timer worldTimer = new Timer(TimerTick) {AutoReset = true};
+            worldTimer.Elapsed += Tick;
+            worldTimer.Enabled = true;
+            ScaleFactor = 10;
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
         }
-
-        private string _text;
-        public string Text
-        {
-            get { return _text; }
-            set
-            {
-                if (_text == value) return;
-                _text = value;
-                RaisePropertyChanged("Text");
-            }
-        }
-
+        
         private void Tick(object sender, ElapsedEventArgs e)
         {
             Timer timer = (Timer)sender;

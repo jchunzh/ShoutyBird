@@ -1,3 +1,4 @@
+using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System.Timers;
@@ -35,14 +36,29 @@ namespace ShoutyCopter.ViewModel
         private double _width;
         private double _height;
 
-        public Vector Position
+        public Vector DisplayPosition
+        {
+            get { return ToDisplayUnits(Position); }
+        }
+
+        public double DisplayHeight
+        {
+            get { return ToDisplayUnits(Height); }
+        }
+
+        public double DisplayWidth
+        {
+            get { return ToDisplayUnits(Width);  }
+        }
+
+        protected Vector Position
         {
             get { return _position; }
             set
             {
                 if (Equals(_position, value)) return;
                 _position = value;
-                RaisePropertyChanged("Position");
+                RaisePropertyChanged("DisplayPosition");
             }
         }
 
@@ -57,25 +73,25 @@ namespace ShoutyCopter.ViewModel
             }
         }
 
-        public double Width
+        protected double Width
         {
             get { return _width; }
             set
             {
                 if (_width == value) return;
                 _width = value;
-                RaisePropertyChanged("Width");
+                RaisePropertyChanged("DisplayWidth");
             }
         }
 
-        public double Height
+        protected double Height
         {
             get { return _height; }
             set
             {
                 if (_height == value) return;
                 _height = value;
-                RaisePropertyChanged("Height");
+                RaisePropertyChanged("DisplayHeight");
             }
         }
 
@@ -89,7 +105,7 @@ namespace ShoutyCopter.ViewModel
             Timer worldTimer = new Timer(TimerTick) {AutoReset = true};
             worldTimer.Elapsed += Tick;
             worldTimer.Enabled = true;
-            ScaleFactor = 10;
+            ScaleFactor = 50;
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
         }
         
@@ -119,6 +135,14 @@ namespace ShoutyCopter.ViewModel
          
         }
 
+        protected Vector ToDisplayUnits(Vector gameUnit)
+        {
+            return new Vector { X = gameUnit.X * ScaleFactor, Y = gameUnit.Y * ScaleFactor};
+        }
 
+        protected double ToDisplayUnits(double gameUnit)
+        {
+            return gameUnit*ScaleFactor;
+        }
     }
 }

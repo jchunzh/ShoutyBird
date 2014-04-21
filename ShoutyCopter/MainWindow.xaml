@@ -7,25 +7,20 @@
         xmlns:cmd="http://www.galasoft.ch/mvvmlight"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:converters="clr-namespace:ShoutyCopter.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525"
         FocusManager.FocusedElement="{Binding ElementName=Display}"
         d:DataContext="{d:DesignInstance viewModels:MainViewModel}">
-    <Window.Resources>
-        <converters:GameUnitsToDIsplayUnitsConverter x:Key="GameToDisplayConverter"/>
-        <sys:Double x:Key="ScaleFactor">50</sys:Double>
-    </Window.Resources>
     <Canvas Name="Display" Focusable="True" IsEnabled="True">
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="KeyDown">
                 <cmd:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
             </i:EventTrigger>
         </i:Interaction.Triggers>
-        <Rectangle Width="{Binding Width, Converter={StaticResource GameToDisplayConverter}, ConverterParameter={StaticResource ScaleFactor}}" 
-                   Height="{Binding Height, Converter={StaticResource GameToDisplayConverter}, ConverterParameter={StaticResource ScaleFactor}}" 
-                   Canvas.Top="{Binding Position.Y, Converter={StaticResource GameToDisplayConverter}, ConverterParameter={StaticResource ScaleFactor}}" 
-                   Canvas.Left="{Binding Position.X, Converter={StaticResource GameToDisplayConverter}, ConverterParameter={StaticResource ScaleFactor}}" Fill="Red">
+        <Rectangle Width="{Binding DisplayWidth}" 
+                   Height="{Binding DisplayHeight}" 
+                   Canvas.Top="{Binding DisplayPosition.Y}" 
+                   Canvas.Left="{Binding DisplayPosition.X}" Fill="Red">
         </Rectangle>
     </Canvas>
 </Window>

@@ -77,7 +77,39 @@ namespace ShoutyCopter.ViewModel
             }
         }
 
-        protected Vector Velocity { get; set; }
+        public Vector Velocity
+        {
+            get { return _velocity; }
+            set
+            {
+                if (Equals(_velocity, value)) return;
+                _velocity = value;
+                RaisePropertyChanged("Velocity");
+            }
+        }
+
+        public Vector DeltaVelocity
+        {
+            get { return _deltaVelocity; }
+            set
+            {
+                if (Equals(_deltaVelocity, value)) return;
+                _deltaVelocity = value;
+                RaisePropertyChanged("DeltaVelocity");
+            }
+        }
+
+        public Vector DeltaPosition
+        {
+            get { return _deltaPosition; }
+            set
+            {
+                if (Equals(_deltaPosition, value)) return;
+                _deltaPosition = value;
+                RaisePropertyChanged("DeltaPosition");
+            }
+        }
+
         protected Vector Acceleration { get; set; }
 
         protected double Width
@@ -117,9 +149,13 @@ namespace ShoutyCopter.ViewModel
             worldTimer.Enabled = true;
             ScaleFactor = 10;
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
+            Acceleration = new Vector() {X = 0, Y = Gravity};
         }
 
         private bool _isBusy = false;
+        private Vector _velocity;
+        private Vector _deltaVelocity;
+        private Vector _deltaPosition;
 
         /// <summary>
         /// Update the unit's acceleration, velocity, and position
@@ -133,11 +169,15 @@ namespace ShoutyCopter.ViewModel
             _isBusy = true;
             Timer timer = (Timer)sender;
 
+            Vector prevVelocity = Velocity;
+
             Velocity = new Vector
             {
                 X = CalculateVelocityChange(Acceleration.X, Velocity.X, timer.Interval),
-                Y = CalculateVelocityChange(Acceleration.Y + Gravity, Velocity.Y, timer.Interval)
+                Y = CalculateVelocityChange(Acceleration.Y, Velocity.Y, timer.Interval)
             };
+
+            DeltaVelocity = new Vector {X = Velocity.X - prevVelocity.X, Y = Velocity.Y - prevVelocity.Y};
 
             while (_actionQueue.Count > 0)
             {
@@ -145,20 +185,20 @@ namespace ShoutyCopter.ViewModel
 
                 if (action == Action.Jump)
                 {
-                    //TODO jumping just stops the character right now. Does not actually result in vertical position change
-                    Acceleration = new Vector {X = Acceleration.X, Y = Acceleration.Y + JumpAcceleration};
+                    //Acceleration = new Vector {X = Acceleration.X, Y = JumpAcceleration};
                     Velocity = new Vector
                     {
-                        X = CalculateVelocityChange(Acceleration.X, Velocity.X, timer.Interval),
-                        Y = CalculateVelocityChange(Acceleration.Y + Gravity, 0, timer.Interval)
+                        X = Velocity.X,
+                        Y = -10
                     };
                 }
             }
 
-           
+            Vector prevPos = Position;
             Position = new Vector { X = Position.X, Y = CacluatePositionChange(Acceleration.Y, Velocity.Y, Position.Y, timer.Interval) };
+            DeltaPosition = new Vector {X = Position.X - prevPos.X, Y = Position.Y - prevPos.Y};
             //Vertical acceleration is always set back to that of gravity after each tick of the simulation
-            Acceleration = new Vector() {X = Acceleration.X, Y = Gravity};
+            //Acceleration = new Vector() {X = Acceleration.X, Y = Gravity};
             _time += ((Timer)sender).Interval;
             _isBusy = false;
         }

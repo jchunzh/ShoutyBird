@@ -22,5 +22,9 @@
                    Canvas.Top="{Binding DisplayPosition.Y}" 
                    Canvas.Left="{Binding DisplayPosition.X}" Fill="Red">
         </Rectangle>
+        <TextBlock Text="{Binding Velocity.Y}" Canvas.Left="153" Canvas.Top="122"></TextBlock>
+        <TextBlock Text="{Binding DeltaVelocity.Y}" Canvas.Left="153" Canvas.Top="150"></TextBlock>
+        <TextBlock Text="{Binding DisplayPosition.Y}" Canvas.Left="153" Canvas.Top="180"></TextBlock>
+        <TextBlock Text="{Binding DeltaPosition.Y}" Canvas.Left="153" Canvas.Top="210"></TextBlock>
     </Canvas>
 </Window>

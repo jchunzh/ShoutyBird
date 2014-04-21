@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoutyCopter", "ShoutyCopter\ShoutyCopter.csproj", "{9B728F5D-99EF-4333-BBFD-7FE48F5A33F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoutyBird", "ShoutyBird\ShoutyBird.csproj", "{9B728F5D-99EF-4333-BBFD-7FE48F5A33F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -23,9 +25,11 @@ namespace ShoutyCopter.ViewModel
     {
         private Vector _position;
 
-        private const float Gravity = 1000f;
+        private const float Gravity = 9.8f;
         //Time between ticks in milliseconds
         private const double TimerTick = 10d;
+
+        private const double JumpAcceleration = -19.6;
 
         /// <summary>
         /// in milliseconds
@@ -51,6 +55,17 @@ namespace ShoutyCopter.ViewModel
             get { return ToDisplayUnits(Width);  }
         }
 
+        public double ScaleFactor
+        {
+            get { return _scaleFactor; }
+            set
+            {
+                if (_scaleFactor == value) return;
+                _scaleFactor = value;
+                RaisePropertyChanged("ScaleFactor");
+            }
+        }
+
         protected Vector Position
         {
             get { return _position; }
@@ -62,16 +77,8 @@ namespace ShoutyCopter.ViewModel
             }
         }
 
-        public double ScaleFactor
-        {
-            get { return _scaleFactor; }
-            set
-            {
-                if (_scaleFactor == value) return;   
-                _scaleFactor = value;
-                RaisePropertyChanged("ScaleFactor");
-            }
-        }
+        protected Vector Velocity { get; set; }
+        protected Vector Acceleration { get; set; }
 
         protected double Width
         {
@@ -95,7 +102,10 @@ namespace ShoutyCopter.ViewModel
             }
         }
 
+        private readonly Queue<Action> _actionQueue = new Queue<Action>();
+
         public RelayCommand<KeyEventArgs> Move { get; private set; }
+        public RelayCommand<MouseEventArgs> MouseCommand { get; private set; }
 
         public MainViewModel()
         {
@@ -105,16 +115,52 @@ namespace ShoutyCopter.ViewModel
             Timer worldTimer = new Timer(TimerTick) {AutoReset = true};
             worldTimer.Elapsed += Tick;
             worldTimer.Enabled = true;
-            ScaleFactor = 50;
+            ScaleFactor = 10;
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
         }
-        
+
+        private bool _isBusy = false;
+
+        /// <summary>
+        /// Update the unit's acceleration, velocity, and position
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Tick(object sender, ElapsedEventArgs e)
         {
+            if (_isBusy) return;
+
+            _isBusy = true;
             Timer timer = (Timer)sender;
 
-            Position = new Vector { X = Position.X, Y = Acceleration(Gravity, 0, Position.Y, timer.Interval) };
+            Velocity = new Vector
+            {
+                X = CalculateVelocityChange(Acceleration.X, Velocity.X, timer.Interval),
+                Y = CalculateVelocityChange(Acceleration.Y + Gravity, Velocity.Y, timer.Interval)
+            };
+
+            while (_actionQueue.Count > 0)
+            {
+                Action action = _actionQueue.Dequeue();
+
+                if (action == Action.Jump)
+                {
+                    //TODO jumping just stops the character right now. Does not actually result in vertical position change
+                    Acceleration = new Vector {X = Acceleration.X, Y = Acceleration.Y + JumpAcceleration};
+                    Velocity = new Vector
+                    {
+                        X = CalculateVelocityChange(Acceleration.X, Velocity.X, timer.Interval),
+                        Y = CalculateVelocityChange(Acceleration.Y + Gravity, 0, timer.Interval)
+                    };
+                }
+            }
+
+           
+            Position = new Vector { X = Position.X, Y = CacluatePositionChange(Acceleration.Y, Velocity.Y, Position.Y, timer.Interval) };
+            //Vertical acceleration is always set back to that of gravity after each tick of the simulation
+            Acceleration = new Vector() {X = Acceleration.X, Y = Gravity};
             _time += ((Timer)sender).Interval;
+            _isBusy = false;
         }
 
         /// <summary>
@@ -125,14 +171,22 @@ namespace ShoutyCopter.ViewModel
         /// <param name="position"></param>
         /// <param name="timeInterval">In milliseconds</param>
         /// <returns></returns>
-        private double Acceleration(double acceleration, double velocity, double position, double timeInterval)
+        private double CacluatePositionChange(double acceleration, double velocity, double position, double timeInterval)
         {
             return acceleration * Math.Pow(timeInterval / 1000, 2) + velocity * timeInterval / 1000 + position;
         }
 
+        private double CalculateVelocityChange(double acceleration, double velocity, double timeInterval)
+        {
+            return acceleration*timeInterval/1000 + velocity;
+        }
+
         private void MoveExecute(KeyEventArgs keyEvent)
         {
-         
+            if (keyEvent.Key == Key.Space)
+            {
+                _actionQueue.Enqueue(Action.Jump);
+            }
         }
 
         protected Vector ToDisplayUnits(Vector gameUnit)

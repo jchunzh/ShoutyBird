@@ -3,14 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:viewModels="clr-namespace:ShoutyCopter.ViewModel"
         xmlns:cmd="http://www.galasoft.ch/mvvmlight"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:viewModel="clr-namespace:ShoutyBird.ViewModel"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525"
         FocusManager.FocusedElement="{Binding ElementName=Display}"
-        d:DataContext="{d:DesignInstance viewModels:MainViewModel}">
+        d:DataContext="{d:DesignInstance viewModel:MainViewModel}">
     <Canvas Name="Display" Focusable="True" IsEnabled="True">
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="KeyDown">

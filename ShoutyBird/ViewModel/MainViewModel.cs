@@ -1,14 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Windows.Controls;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using System.Timers;
 using System.Windows.Input;
-using System;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 
-namespace ShoutyCopter.ViewModel
+namespace ShoutyBird.ViewModel
 {
     /// <summary>
     /// This class contains properties that the main View can data bind to.

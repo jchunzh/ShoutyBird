@@ -12,11 +12,10 @@
   See http://www.galasoft.ch/mvvm
 */
 
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 
-namespace ShoutyCopter.ViewModel
+namespace ShoutyBird.ViewModel
 {
     /// <summary>
     /// This class contains static references to all the view models in the

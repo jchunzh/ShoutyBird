@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using GalaSoft.MvvmLight;
+using ShoutyCopter;
 
-namespace ShoutyCopter.ViewModel
+namespace ShoutyBird.ViewModel
 {
     public class Bird : ViewModelBase
     {

@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using ShoutyCopter.ViewModel;
+using ShoutyBird.ViewModel;
 
 namespace ShoutyCopter
 {

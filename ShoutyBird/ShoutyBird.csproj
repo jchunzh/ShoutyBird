@@ -67,6 +67,7 @@
     </ApplicationDefinition>
     <Compile Include="Vector.cs" />
     <Compile Include="ViewModel\Action.cs" />
+    <Compile Include="ViewModel\Bird.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="MainWindow.xaml">

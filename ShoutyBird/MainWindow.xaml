@@ -17,14 +17,14 @@
                 <cmd:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
             </i:EventTrigger>
         </i:Interaction.Triggers>
-        <Rectangle Width="{Binding DisplayWidth}" 
-                   Height="{Binding DisplayHeight}" 
-                   Canvas.Top="{Binding DisplayPosition.Y}" 
-                   Canvas.Left="{Binding DisplayPosition.X}" Fill="Red">
+        <Rectangle Width="{Binding Bird.DisplayWidth}" 
+                   Height="{Binding Bird.DisplayHeight}" 
+                   Canvas.Top="{Binding Bird.DisplayPosition.Y}" 
+                   Canvas.Left="{Binding Bird.DisplayPosition.X}" Fill="Red">
         </Rectangle>
-        <TextBlock Text="{Binding Velocity.Y}" Canvas.Left="153" Canvas.Top="122"></TextBlock>
-        <TextBlock Text="{Binding DeltaVelocity.Y}" Canvas.Left="153" Canvas.Top="150"></TextBlock>
-        <TextBlock Text="{Binding DisplayPosition.Y}" Canvas.Left="153" Canvas.Top="180"></TextBlock>
-        <TextBlock Text="{Binding DeltaPosition.Y}" Canvas.Left="153" Canvas.Top="210"></TextBlock>
+        <TextBlock Text="{Binding Bird.Velocity.Y}" Canvas.Left="153" Canvas.Top="122"></TextBlock>
+        <TextBlock Text="{Binding Bird.DeltaVelocity.Y}" Canvas.Left="153" Canvas.Top="150"></TextBlock>
+        <TextBlock Text="{Binding Bird.DisplayPosition.Y}" Canvas.Left="153" Canvas.Top="180"></TextBlock>
+        <TextBlock Text="{Binding Bird.DeltaPosition.Y}" Canvas.Left="153" Canvas.Top="210"></TextBlock>
     </Canvas>
 </Window>

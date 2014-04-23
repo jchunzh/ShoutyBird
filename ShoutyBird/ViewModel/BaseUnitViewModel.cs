@@ -9,7 +9,7 @@ namespace ShoutyBird.ViewModel
     public delegate void CollisionEventHandler(object sender, BaseUnitViewModel collidingUnit);
     public delegate void PositionChangedEventHandler(object sender, PositionChangedEventArgs e);
 
-    public abstract class BaseUnitViewModel : ViewModelBase
+    public abstract class BaseUnitViewModel : ViewModelBase, IDisposable
     {
         private Vector _position;
         private double _scaleFactor;
@@ -67,9 +67,13 @@ namespace ShoutyBird.ViewModel
             set
             {
                 if (Equals(_position, value)) return;
+                Vector prevPosition = _position;
                 _position = value;
                 UpdateVertices();
                 RaisePropertyChanged("DisplayPosition");
+
+                if (OnPositionChanged != null)
+                    OnPositionChanged(this, new PositionChangedEventArgs(prevPosition, Position));
             }
         }
 
@@ -175,6 +179,11 @@ namespace ShoutyBird.ViewModel
                            Y1 = Position.Y,
                            Y2 = Position.Y + Height
                        };
+        }
+
+        public virtual void Dispose()
+        {
+            throw new NotImplementedException();
         }
     }
 }

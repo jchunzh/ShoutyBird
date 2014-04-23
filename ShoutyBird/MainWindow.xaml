@@ -36,11 +36,5 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <StackPanel Orientation="Vertical">
-            <TextBox Text="{Binding ConditionOne}"/>
-            <TextBox Text="{Binding ConditionTwo}"/>
-            <TextBox Text="{Binding ConditionThree}"/>
-            <TextBox Text="{Binding ConditionFour}"/>
-        </StackPanel>
     </StackPanel>
 </Window>

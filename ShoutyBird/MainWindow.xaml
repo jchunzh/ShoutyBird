@@ -16,24 +16,31 @@
 <Window.Resources>
     <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
 </Window.Resources>
-    <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}">
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="KeyDown">
-                <cmd:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
-        <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-                <Canvas IsItemsHost="True">
-                </Canvas>
-            </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <Border Width="{Binding DisplayWidth}" Height="{Binding DisplayHeight}" Margin="{Binding DisplayPosition, Converter={StaticResource PositionToMarginConverter}}">
-                    <shoutyBird:UnitUserControl BackgroundBrush="{Binding BackgroundBrush}"/>
-                </Border>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <StackPanel Orientation="Horizontal">
+        <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="KeyDown">
+                    <cmd:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas IsItemsHost="True" Width="400"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Width="{Binding DisplayWidth}" Height="{Binding DisplayHeight}" Margin="{Binding DisplayPosition, Converter={StaticResource PositionToMarginConverter}}">
+                        <shoutyBird:UnitUserControl BackgroundBrush="{Binding BackgroundBrush}"/>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <StackPanel Orientation="Vertical">
+            <TextBox Text="{Binding ConditionOne}"/>
+            <TextBox Text="{Binding ConditionTwo}"/>
+            <TextBox Text="{Binding ConditionThree}"/>
+            <TextBox Text="{Binding ConditionFour}"/>
+        </StackPanel>
+    </StackPanel>
 </Window>

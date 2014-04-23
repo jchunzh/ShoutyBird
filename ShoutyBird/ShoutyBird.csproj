@@ -77,6 +77,9 @@
     <Compile Include="ViewModel\Bird.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\PipeViewModel.cs" />
+    <Compile Include="ViewModel\PositionChangedEventArgs.cs" />
+    <Compile Include="ViewModel\UnitMovedMessage.cs" />
+    <Compile Include="ViewModel\Vertices.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

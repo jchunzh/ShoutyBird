@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
 using ShoutyCopter;
 
 namespace ShoutyBird.ViewModel
@@ -11,11 +12,11 @@ namespace ShoutyBird.ViewModel
 
         public Bird()
         {
-            Acceleration = new Vector { X = 0, Y = Gravity };
+            //Acceleration = new Vector { X = 0, Y = Gravity };
             ScaleFactor = 10;
             Position = new Vector { X = 0, Y = 0 };
-            Width = 1;
-            Height = 1;
+
+            OnUpdate += (sender, args) => Messenger.Default.Send(new UnitUpdateMessage(this));
         }
 
         public override void Update(double timeInterval)

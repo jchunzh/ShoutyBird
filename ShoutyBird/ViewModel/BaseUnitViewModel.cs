@@ -6,11 +6,11 @@ using ShoutyCopter;
 
 namespace ShoutyBird.ViewModel
 {
-    public delegate EventHandler CollisionEventHandler(object sender, BaseUnitViewModel collidingUnit);
+    public delegate void CollisionEventHandler(object sender, BaseUnitViewModel collidingUnit);
+    public delegate void PositionChangedEventHandler(object sender, PositionChangedEventArgs e);
 
     public abstract class BaseUnitViewModel : ViewModelBase
     {
-        protected const float Gravity = 9.8f;
         private Vector _position;
         private double _scaleFactor;
         private double _width;
@@ -19,6 +19,8 @@ namespace ShoutyBird.ViewModel
         private Brush _backgroundBrush;
 
         public event CollisionEventHandler OnCollision;
+        public event PositionChangedEventHandler OnPositionChanged;
+        public event EventHandler OnUpdate;
 
         public Brush BackgroundBrush
         {
@@ -57,6 +59,8 @@ namespace ShoutyBird.ViewModel
             get { return ToDisplayUnits(Width); }
         }
 
+        public Vertices Vertices { get; private set; }
+
         public Vector Position
         {
             get { return _position; }
@@ -64,6 +68,7 @@ namespace ShoutyBird.ViewModel
             {
                 if (Equals(_position, value)) return;
                 _position = value;
+                UpdateVertices();
                 RaisePropertyChanged("DisplayPosition");
             }
         }
@@ -79,7 +84,7 @@ namespace ShoutyBird.ViewModel
             }
         }
 
-        protected Vector Acceleration { get; set; }
+        public Vector Acceleration { get; set; }
 
         public double Width
         {
@@ -88,6 +93,7 @@ namespace ShoutyBird.ViewModel
             {
                 if (_width == value) return;
                 _width = value;
+                UpdateVertices();
                 RaisePropertyChanged("DisplayWidth");
             }
         }
@@ -99,6 +105,7 @@ namespace ShoutyBird.ViewModel
             {
                 if (_height == value) return;
                 _height = value;
+                UpdateVertices();
                 RaisePropertyChanged("DisplayHeight");
             }
         }
@@ -115,19 +122,25 @@ namespace ShoutyBird.ViewModel
 
         public virtual void Update(double timeInterval)
         {
+            if (OnUpdate != null)
+                OnUpdate(this, null);
+
             Velocity = new Vector
             {
                 X = CalculateVelocityChange(Acceleration.X, Velocity.X, timeInterval),
                 Y = CalculateVelocityChange(Acceleration.Y, Velocity.Y, timeInterval)
             };
 
+            Vector prevPosition = Position;
             Position = new Vector
             {
                 X = CacluatePositionChange(Acceleration.X, Velocity.X, Position.X, timeInterval),
                 Y = CacluatePositionChange(Acceleration.Y, Velocity.Y, Position.Y, timeInterval)
             };
-        }
 
+            //if (OnPositionChanged != null && prevPosition.X != Position.X && prevPosition.Y != Position.Y)
+            //    OnPositionChanged(this, new PositionChangedEventArgs(prevPosition, Position));
+        }
 
         /// <summary>
         /// Calculates the position change
@@ -145,6 +158,23 @@ namespace ShoutyBird.ViewModel
         protected double CalculateVelocityChange(double acceleration, double velocity, double timeInterval)
         {
             return acceleration * timeInterval / 1000 + velocity;
+        }
+
+        protected void RaiseOnCollision(object sender, BaseUnitViewModel collidingUnit)
+        {
+            if (OnCollision != null)
+                OnCollision(sender, collidingUnit);
+        }
+
+        private void UpdateVertices()
+        {
+            Vertices = new Vertices
+                       {
+                           X1 = Position.X,
+                           X2 = Position.X + Width,
+                           Y1 = Position.Y,
+                           Y2 = Position.Y + Height
+                       };
         }
     }
 }

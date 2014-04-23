@@ -1,7 +1,10 @@
+using System.Collections.ObjectModel;
 using System.Timers;
 using System.Windows.Input;
+using System.Windows.Media;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using ShoutyCopter;
 
 namespace ShoutyBird.ViewModel
 {
@@ -27,6 +30,18 @@ namespace ShoutyBird.ViewModel
         private double _time;
         private bool _isBusy = false;
         private Bird _bird;
+        private ObservableCollection<BaseUnitViewModel> _unitCollection;
+
+        public ObservableCollection<BaseUnitViewModel> UnitCollection
+        {
+            get { return _unitCollection; }
+            set
+            {
+                if (Equals(_unitCollection, value)) return;
+                _unitCollection = value;
+                RaisePropertyChanged("UnitCollection");
+            }
+        }
 
         public Bird Bird
         {
@@ -47,9 +62,22 @@ namespace ShoutyBird.ViewModel
             Timer worldTimer = new Timer(TimerTick) {AutoReset = true};
             worldTimer.Elapsed += Tick;
             worldTimer.Enabled = true;
-            Bird = new Bird();
-            
+            Bird = new Bird { BackgroundBrush = new SolidColorBrush(Colors.Red)};
+            UnitCollection = new ObservableCollection<BaseUnitViewModel>();
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
+
+            UnitCollection.CollectionChanged += (sender, args) => 
+                RaisePropertyChanged("UnitCollection");
+            UnitCollection.Add(new PipeViewModel
+                               {
+                                   Position = new Vector { X = 20, Y = 0 }, 
+                                   Width = 10, 
+                                   Height = 10, 
+                                   ScaleFactor = 10, 
+                                   BackgroundBrush = new SolidColorBrush(Colors.Green), 
+                                   Velocity = new Vector { X = -10, Y = 0}
+                               });
+            UnitCollection.Add(Bird);
         }
 
         /// <summary>
@@ -64,7 +92,11 @@ namespace ShoutyBird.ViewModel
             _isBusy = true;
             Timer timer = (Timer)sender;
 
-            Bird.Update(timer.Interval);
+            //Bird.Update(timer.Interval);
+            foreach (var unit in UnitCollection)
+            {
+                unit.Update(timer.Interval);
+            }
 
             _time += ((Timer)sender).Interval;
             _isBusy = false;

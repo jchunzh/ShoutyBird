@@ -1,4 +1,4 @@
-﻿<Window x:Class="ShoutyCopter.MainWindow"
+﻿<Window x:Class="ShoutyBird.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,24 +7,33 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:viewModel="clr-namespace:ShoutyBird.ViewModel"
+        xmlns:shoutyBird="clr-namespace:ShoutyBird"
+        xmlns:converters="clr-namespace:ShoutyBird.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525"
         FocusManager.FocusedElement="{Binding ElementName=Display}"
         d:DataContext="{d:DesignInstance viewModel:MainViewModel}">
-    <Canvas Name="Display" Focusable="True" IsEnabled="True">
+<Window.Resources>
+    <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
+</Window.Resources>
+    <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}">
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="KeyDown">
                 <cmd:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
             </i:EventTrigger>
         </i:Interaction.Triggers>
-        <Rectangle Width="{Binding Bird.DisplayWidth}" 
-                   Height="{Binding Bird.DisplayHeight}" 
-                   Canvas.Top="{Binding Bird.DisplayPosition.Y}" 
-                   Canvas.Left="{Binding Bird.DisplayPosition.X}" Fill="Red">
-        </Rectangle>
-        <TextBlock Text="{Binding Bird.Velocity.Y}" Canvas.Left="153" Canvas.Top="122"></TextBlock>
-        <TextBlock Text="{Binding Bird.DeltaVelocity.Y}" Canvas.Left="153" Canvas.Top="150"></TextBlock>
-        <TextBlock Text="{Binding Bird.DisplayPosition.Y}" Canvas.Left="153" Canvas.Top="180"></TextBlock>
-        <TextBlock Text="{Binding Bird.DeltaPosition.Y}" Canvas.Left="153" Canvas.Top="210"></TextBlock>
-    </Canvas>
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <Canvas IsItemsHost="True">
+                </Canvas>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Border Width="{Binding DisplayWidth}" Height="{Binding DisplayHeight}" Margin="{Binding DisplayPosition, Converter={StaticResource PositionToMarginConverter}}">
+                    <shoutyBird:UnitUserControl BackgroundBrush="{Binding BackgroundBrush}"/>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 </Window>

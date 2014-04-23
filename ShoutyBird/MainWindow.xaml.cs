@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using ShoutyBird.ViewModel;
 
-namespace ShoutyCopter
+namespace ShoutyBird
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

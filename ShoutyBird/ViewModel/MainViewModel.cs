@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
@@ -31,7 +32,7 @@ namespace ShoutyBird.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        protected const float Gravity = 9.8f;
+        protected const float Gravity = 500f;
         //Time between ticks in milliseconds
         private const int TimerTick = 10;
         /// <summary>
@@ -42,10 +43,30 @@ namespace ShoutyBird.ViewModel
         private readonly Timer _worldTimer;
         private Bird _bird;
 
-        private object removeQueueLock = new object();
+        private readonly object removeQueueLock = new object();
         private readonly Queue<BaseUnitViewModel> _unitsToRemove = new Queue<BaseUnitViewModel>();
 
         private ObservableCollection<BaseUnitViewModel> _unitCollection;
+
+        /// <summary>
+        /// In ingame units
+        /// </summary>
+        private readonly double _screenWidth;
+        /// <summary>
+        /// In ingame units
+        /// </summary>
+        private readonly double _screenHeight;
+        private readonly double _scale;
+        //Pipe width / scren width
+        private const double PipeWidthFactor = 0.1835;
+        //Bird width / screen width
+        private const double BirdWidthFactor = 0.1089;
+        //Bird height / screen height
+        private const double BirdHeightFactor = 0.0695;
+        private const double BirdJumpSpeed = -100;
+
+        //Pipe speed is about 37.9% of the screen width per second
+        private const double PipeSpeedFactor = -0.379;
 
         public ObservableCollection<BaseUnitViewModel> UnitCollection
         {
@@ -72,23 +93,30 @@ namespace ShoutyBird.ViewModel
         public RelayCommand<KeyEventArgs> Move { get; private set; }
         public RelayCommand<MouseEventArgs> MouseCommand { get; private set; }
 
-
-        public MainViewModel()
+        public MainViewModel(double screenWidth, double screenHeight)
         {
-            //_worldTimer = new Timer(Tick, null, 0, TimerTick);
+            _scale = 10;
+            _screenWidth = ToGameUnits(screenWidth, _scale);
+            _screenHeight = ToGameUnits(screenHeight, _scale);
             _worldTimer = new Timer
                           {
                               Interval = TimerTick,
                           };
             _worldTimer.Tick += Tick;
             _worldTimer.Start();
-            Bird = new Bird
+            Bird = new Bird(BirdJumpSpeed)
                    {
                        BackgroundBrush = new SolidColorBrush(Colors.Red), 
-                       Width = 1, 
-                       Height = 1,
-                       Acceleration = new Vector { X = 0, Y = Gravity}
+                       Width = _screenWidth * BirdWidthFactor, 
+                       Height = _screenHeight * BirdHeightFactor,
+                       Acceleration = new Vector { X = 0, Y = Gravity},
+                       ScaleFactor = _scale,
                    };
+            Bird.Position = new Vector
+                            {
+                                X = (_screenWidth + Bird.Width)/2,
+                                Y = (_screenHeight + Bird.Height)/8
+                            };
             UnitCollection = new ObservableCollection<BaseUnitViewModel>();
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
 
@@ -141,12 +169,12 @@ namespace ShoutyBird.ViewModel
         {
             PipeViewModel pipe = new PipeViewModel
             {
-                Position = new Vector { X = 20, Y = 0 },
-                Width = 10,
+                Position = new Vector { X = _screenWidth + 1, Y = 0 },
+                Width = _screenWidth * PipeWidthFactor,
                 Height = 10,
-                ScaleFactor = 10,
+                ScaleFactor = _scale,
                 BackgroundBrush = new SolidColorBrush(Colors.Green),
-                Velocity = new Vector { X = -10, Y = 0 }
+                Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
             };
             pipe.OnCollision += (s, e) =>
             {
@@ -159,7 +187,7 @@ namespace ShoutyBird.ViewModel
             pipe.OnPositionChanged += (sender, args) =>
                                       {
                                           PipeViewModel p = (PipeViewModel)sender;
-                                          if (p.Vertices.X2 < 0)
+                                          if (p.Vertices.X2 < -10)
                                           {
                                             Messenger.Default.Send(new RemovePipeMessage(p));
                                           }
@@ -179,6 +207,11 @@ namespace ShoutyBird.ViewModel
         private void Pause()
         {
             _worldTimer.Stop();
+        }
+
+        private double ToGameUnits(double displayUnit, double scale)
+        {
+            return displayUnit / scale;
         }
     }
 }

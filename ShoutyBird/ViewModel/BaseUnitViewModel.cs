@@ -77,6 +77,9 @@ namespace ShoutyBird.ViewModel
             }
         }
 
+        /// <summary>
+        /// In gameunits / second
+        /// </summary>
         public Vector Velocity
         {
             get { return _velocity; }
@@ -114,7 +117,7 @@ namespace ShoutyBird.ViewModel
             }
         }
 
-        protected Vector ToDisplayUnits(Vector gameUnit)
+        public Vector ToDisplayUnits(Vector gameUnit)
         {
             return new Vector { X = gameUnit.X * ScaleFactor, Y = gameUnit.Y * ScaleFactor };
         }

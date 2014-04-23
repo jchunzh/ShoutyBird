@@ -10,10 +10,11 @@ namespace ShoutyBird.ViewModel
     {
         private readonly Queue<Action> _actionQueue = new Queue<Action>();
 
-        public Bird()
+        private readonly double JumpSpeed;
+
+        public Bird(double jumpSpeed)
         {
-            //Acceleration = new Vector { X = 0, Y = Gravity };
-            ScaleFactor = 10;
+            JumpSpeed = jumpSpeed;
             Position = new Vector { X = 0, Y = 0 };
 
             OnUpdate += (sender, args) => Messenger.Default.Send(new UnitUpdateMessage(this));
@@ -30,7 +31,7 @@ namespace ShoutyBird.ViewModel
                     Velocity = new Vector
                     {
                         X = Velocity.X,
-                        Y = -10
+                        Y = JumpSpeed
                     };
                 }
             }

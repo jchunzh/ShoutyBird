@@ -10,14 +10,13 @@
         xmlns:shoutyBird="clr-namespace:ShoutyBird"
         xmlns:converters="clr-namespace:ShoutyBird.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
+        Title="MainWindow" Height="800" Width="640"
         FocusManager.FocusedElement="{Binding ElementName=Display}"
         d:DataContext="{d:DesignInstance viewModel:MainViewModel}">
-<Window.Resources>
-    <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
-</Window.Resources>
-    <StackPanel Orientation="Horizontal">
-        <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}">
+    <Window.Resources>
+        <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
+    </Window.Resources>
+    <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="KeyDown">
                     <cmd:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
@@ -25,7 +24,7 @@
             </i:Interaction.Triggers>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas IsItemsHost="True" Width="400"/>
+                    <Canvas IsItemsHost="True"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
@@ -36,5 +35,4 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-    </StackPanel>
 </Window>

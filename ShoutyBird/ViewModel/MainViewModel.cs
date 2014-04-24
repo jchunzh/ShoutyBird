@@ -178,6 +178,9 @@ namespace ShoutyBird.ViewModel
             }
         }
 
+        /// <summary>
+        /// Amount of distance in game units the pipes have covered
+        /// </summary>
         private double _distancePassed = 0;
         private int _score;
 

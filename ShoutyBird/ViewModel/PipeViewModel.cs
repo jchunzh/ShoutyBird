@@ -18,7 +18,7 @@ namespace ShoutyBird.ViewModel
             
             if (IsCollision(Vertices, message.Unit.Vertices))
             {
-                RaiseOnCollision(this, message.Unit);
+                OnCollision(this, message.Unit);
             }
         }
 

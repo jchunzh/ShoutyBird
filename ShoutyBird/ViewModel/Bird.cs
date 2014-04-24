@@ -17,7 +17,7 @@ namespace ShoutyBird.ViewModel
             JumpSpeed = jumpSpeed;
             Position = new Vector { X = 0, Y = 0 };
 
-            OnUpdate += (sender, args) => Messenger.Default.Send(new UnitUpdateMessage(this));
+            Updated += (sender, args) => Messenger.Default.Send(new UnitUpdateMessage(this));
         }
 
         public override void Update(double timeInterval)

@@ -176,7 +176,7 @@ namespace ShoutyBird.ViewModel
                 BackgroundBrush = new SolidColorBrush(Colors.Green),
                 Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
             };
-            pipe.OnCollision += (s, e) =>
+            pipe.Collision += (s, e) =>
             {
                 if (e.GetType() == typeof(Bird))
                 {
@@ -184,7 +184,7 @@ namespace ShoutyBird.ViewModel
                 }
             };
 
-            pipe.OnPositionChanged += (sender, args) =>
+            pipe.PositionChanged += (sender, args) =>
                                       {
                                           PipeViewModel p = (PipeViewModel)sender;
                                           if (p.Vertices.X2 < -10)

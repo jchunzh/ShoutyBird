@@ -18,9 +18,9 @@ namespace ShoutyBird.ViewModel
         private Vector _velocity;
         private Brush _backgroundBrush;
 
-        public event CollisionEventHandler OnCollision;
-        public event PositionChangedEventHandler OnPositionChanged;
-        public event EventHandler OnUpdate;
+        public event CollisionEventHandler Collision;
+        public event PositionChangedEventHandler PositionChanged;
+        public event EventHandler Updated;
 
         public Brush BackgroundBrush
         {
@@ -72,8 +72,7 @@ namespace ShoutyBird.ViewModel
                 UpdateVertices();
                 RaisePropertyChanged("DisplayPosition");
 
-                if (OnPositionChanged != null)
-                    OnPositionChanged(this, new PositionChangedEventArgs(prevPosition, Position));
+                OnPositionChanged(prevPosition);
             }
         }
 
@@ -129,8 +128,7 @@ namespace ShoutyBird.ViewModel
 
         public virtual void Update(double timeInterval)
         {
-            if (OnUpdate != null)
-                OnUpdate(this, null);
+            OnUpdated();
 
             Velocity = new Vector
             {
@@ -167,10 +165,22 @@ namespace ShoutyBird.ViewModel
             return acceleration * timeInterval / 1000 + velocity;
         }
 
-        protected void RaiseOnCollision(object sender, BaseUnitViewModel collidingUnit)
+        protected void OnCollision(object sender, BaseUnitViewModel collidingUnit)
         {
-            if (OnCollision != null)
-                OnCollision(sender, collidingUnit);
+            if (Collision != null)
+                Collision(sender, collidingUnit);
+        }
+
+        protected void OnUpdated()
+        {
+            if (Updated != null)
+                Updated(this, null);
+        }
+
+        protected void OnPositionChanged(Vector prevPosition)
+        {
+            if (PositionChanged != null)
+                PositionChanged(this, new PositionChangedEventArgs(prevPosition, Position));
         }
 
         private void UpdateVertices()

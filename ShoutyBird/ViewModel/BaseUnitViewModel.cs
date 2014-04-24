@@ -129,6 +129,22 @@ namespace ShoutyBird.ViewModel
         protected BaseUnitViewModel()
         {
             Updated += (sender, args) => Messenger.Default.Send(new UnitUpdateMessage(this));
+            Messenger.Default.Register<UnitUpdateMessage>(this, UnitUpdateMessageRecieved);
+        }
+
+        protected virtual void UnitUpdateMessageRecieved(UnitUpdateMessage message)
+        {
+        }
+
+        protected bool IsCollision(Vertices a, Vertices b)
+        {
+            if (a.X1 <= b.X2 &&
+                a.X2 >= b.X1 &&
+                a.Y1 <= b.Y2 &&
+                a.Y2 >= b.Y1)
+                return true;
+
+            return false;
         }
 
         public virtual void Update(double timeInterval)

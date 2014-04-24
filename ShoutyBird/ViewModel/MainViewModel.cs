@@ -115,6 +115,7 @@ namespace ShoutyBird.ViewModel
                                 X = (_screenWidth + Bird.Width)/2,
                                 Y = (_screenHeight + Bird.Height)/8
                             };
+            Bird.Collision += (sender, unit) => Pause();
             UnitCollection = new ObservableCollection<BaseUnitViewModel>();
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
 

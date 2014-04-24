@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows.Documents;
 using ShoutyCopter;
 
 namespace ShoutyBird.ViewModel
@@ -32,6 +33,16 @@ namespace ShoutyBird.ViewModel
             }
 
             base.Update(timeInterval);
+        }
+
+        protected override void UnitUpdateMessageRecieved(UnitUpdateMessage message)
+        {
+            if (message.Unit == this) return;
+
+            if (IsCollision(message.Unit.Vertices, Vertices))
+            {
+                OnCollision(this, message.Unit);
+            }
         }
 
         public void QueueJump()

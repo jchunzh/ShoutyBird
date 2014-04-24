@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Messaging;
+﻿using System.Collections.Generic;
 using ShoutyCopter;
 
 namespace ShoutyBird.ViewModel
@@ -41,6 +38,5 @@ namespace ShoutyBird.ViewModel
         {
             _actionQueue.Enqueue(Action.Jump);
         }
-
     }
 }

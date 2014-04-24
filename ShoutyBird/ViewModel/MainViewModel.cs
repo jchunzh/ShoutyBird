@@ -1,11 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Threading;
-using System.Timers;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using GalaSoft.MvvmLight;
@@ -32,6 +27,9 @@ namespace ShoutyBird.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
+        /// <summary>
+        /// In ingame units/s^2
+        /// </summary>
         protected const float Gravity = 500f;
         //Time between ticks in milliseconds
         private const int TimerTick = 10;
@@ -39,7 +37,7 @@ namespace ShoutyBird.ViewModel
         /// in milliseconds
         /// </summary>
         private double _time;
-        private bool _isBusy = false;
+        private bool _isBusy;
         private readonly Timer _worldTimer;
         private Bird _bird;
 
@@ -91,13 +89,13 @@ namespace ShoutyBird.ViewModel
         }
 
         public RelayCommand<KeyEventArgs> Move { get; private set; }
-        public RelayCommand<MouseEventArgs> MouseCommand { get; private set; }
 
         public MainViewModel(double screenWidth, double screenHeight)
         {
             _scale = 10;
             _screenWidth = ToGameUnits(screenWidth, _scale);
             _screenHeight = ToGameUnits(screenHeight, _scale);
+            //Needs to be Windows.Forms.Timer as the other timers are asynchronous
             _worldTimer = new Timer
                           {
                               Interval = TimerTick,
@@ -131,6 +129,7 @@ namespace ShoutyBird.ViewModel
 
         private void RemovePipeMessageRecieved(RemovePipeMessage message)
         {
+            //Event is fired on not the main thread (maybe?). Just in case, add unit to list of units to remove
             lock (removeQueueLock)
             {
                 _unitsToRemove.Enqueue(message.Pipe);
@@ -146,7 +145,6 @@ namespace ShoutyBird.ViewModel
 
             _isBusy = true;
 
-            //Bird.Update(timer.Interval);
             foreach (var unit in UnitCollection)
             {
                 unit.Update(TimerTick);
@@ -189,7 +187,8 @@ namespace ShoutyBird.ViewModel
                                           PipeViewModel p = (PipeViewModel)sender;
                                           if (p.Vertices.X2 < -10)
                                           {
-                                            Messenger.Default.Send(new RemovePipeMessage(p));
+                                             //Delete the pipe if it goes off screen
+                                             Messenger.Default.Send(new RemovePipeMessage(p));
                                           }
                                       };
 

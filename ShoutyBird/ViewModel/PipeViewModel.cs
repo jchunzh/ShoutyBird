@@ -1,7 +1,4 @@
-﻿using System.CodeDom;
-using System.Windows.Forms;
-using GalaSoft.MvvmLight.Messaging;
-using ShoutyCopter;
+﻿using GalaSoft.MvvmLight.Messaging;
 
 namespace ShoutyBird.ViewModel
 {
@@ -32,7 +29,6 @@ namespace ShoutyBird.ViewModel
 
             return false;
         }
-
 
         public override void Update(double timeInterval)
         {

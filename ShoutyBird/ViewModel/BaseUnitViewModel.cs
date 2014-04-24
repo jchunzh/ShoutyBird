@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Data;
 using System.Windows.Media;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
@@ -142,7 +141,6 @@ namespace ShoutyBird.ViewModel
                 Y = CalculateVelocityChange(Acceleration.Y, Velocity.Y, timeInterval)
             };
 
-            Vector prevPosition = Position;
             Position = new Vector
             {
                 X = CacluatePositionChange(Acceleration.X, Velocity.X, Position.X, timeInterval),

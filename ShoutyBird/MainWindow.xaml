@@ -5,7 +5,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:cmd="http://www.galasoft.ch/mvvmlight"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:viewModel="clr-namespace:ShoutyBird.ViewModel"
         xmlns:shoutyBird="clr-namespace:ShoutyBird"
         xmlns:converters="clr-namespace:ShoutyBird.Converters"

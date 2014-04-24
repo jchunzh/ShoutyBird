@@ -2,6 +2,7 @@
 using System.Windows.Data;
 using System.Windows.Media;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
 using ShoutyCopter;
 
 namespace ShoutyBird.ViewModel
@@ -126,6 +127,11 @@ namespace ShoutyBird.ViewModel
             return gameUnit * ScaleFactor;
         }
 
+        protected BaseUnitViewModel()
+        {
+            Updated += (sender, args) => Messenger.Default.Send(new UnitUpdateMessage(this));
+        }
+
         public virtual void Update(double timeInterval)
         {
             OnUpdated();
@@ -142,9 +148,6 @@ namespace ShoutyBird.ViewModel
                 X = CacluatePositionChange(Acceleration.X, Velocity.X, Position.X, timeInterval),
                 Y = CacluatePositionChange(Acceleration.Y, Velocity.Y, Position.Y, timeInterval)
             };
-
-            //if (OnPositionChanged != null && prevPosition.X != Position.X && prevPosition.Y != Position.Y)
-            //    OnPositionChanged(this, new PositionChangedEventArgs(prevPosition, Position));
         }
 
         /// <summary>

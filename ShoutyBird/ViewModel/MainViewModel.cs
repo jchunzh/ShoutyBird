@@ -119,7 +119,7 @@ namespace ShoutyBird.ViewModel
             UnitCollection = new ObservableCollection<BaseUnitViewModel>();
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
 
-            Messenger.Default.Register<RemovePipeMessage>(this, RemovePipeMessageRecieved);
+            Messenger.Default.Register<RemoveSurfaceMessage>(this, RemovePipeMessageRecieved);
 
             UnitCollection.CollectionChanged += (sender, args) => 
                 RaisePropertyChanged("UnitCollection");
@@ -128,12 +128,12 @@ namespace ShoutyBird.ViewModel
             UnitCollection.Add(Bird);
         }
 
-        private void RemovePipeMessageRecieved(RemovePipeMessage message)
+        private void RemovePipeMessageRecieved(RemoveSurfaceMessage message)
         {
             //Event is fired on not the main thread (maybe?). Just in case, add unit to list of units to remove
             lock (removeQueueLock)
             {
-                _unitsToRemove.Enqueue(message.Pipe);
+                _unitsToRemove.Enqueue(message.Surface);
             }
         }
 
@@ -166,7 +166,7 @@ namespace ShoutyBird.ViewModel
 
         private void CreatePipe()
         {
-            PipeViewModel pipe = new PipeViewModel
+            SurfaceViewModel surface = new SurfaceViewModel
             {
                 Position = new Vector { X = _screenWidth + 1, Y = 0 },
                 Width = _screenWidth * PipeWidthFactor,
@@ -175,7 +175,7 @@ namespace ShoutyBird.ViewModel
                 BackgroundBrush = new SolidColorBrush(Colors.Green),
                 Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
             };
-            pipe.Collision += (s, e) =>
+            surface.Collision += (s, e) =>
             {
                 if (e.GetType() == typeof(Bird))
                 {
@@ -183,17 +183,17 @@ namespace ShoutyBird.ViewModel
                 }
             };
 
-            pipe.PositionChanged += (sender, args) =>
+            surface.PositionChanged += (sender, args) =>
                                       {
-                                          PipeViewModel p = (PipeViewModel)sender;
+                                          SurfaceViewModel p = (SurfaceViewModel)sender;
                                           if (p.Vertices.X2 < -10)
                                           {
                                              //Delete the pipe if it goes off screen
-                                             Messenger.Default.Send(new RemovePipeMessage(p));
+                                             Messenger.Default.Send(new RemoveSurfaceMessage(p));
                                           }
                                       };
 
-            UnitCollection.Add(pipe);
+            UnitCollection.Add(surface);
         }
 
         private void MoveExecute(KeyEventArgs keyEvent)

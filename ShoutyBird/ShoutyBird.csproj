@@ -78,7 +78,7 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\PipeViewModel.cs" />
     <Compile Include="ViewModel\PositionChangedEventArgs.cs" />
-    <Compile Include="ViewModel\RemovePipeMessage.cs" />
+    <Compile Include="ViewModel\RemoveSurfaceMessage.cs" />
     <Compile Include="ViewModel\UnitMovedMessage.cs" />
     <Compile Include="ViewModel\Vertices.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />

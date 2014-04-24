@@ -1,10 +1,8 @@
-﻿using GalaSoft.MvvmLight.Messaging;
-
-namespace ShoutyBird.ViewModel
+﻿namespace ShoutyBird.ViewModel
 {
-    public class PipeViewModel : BaseUnitViewModel
+    public class SurfaceViewModel : BaseUnitViewModel
     {
-        public PipeViewModel()
+        public SurfaceViewModel()
         {
             
         }

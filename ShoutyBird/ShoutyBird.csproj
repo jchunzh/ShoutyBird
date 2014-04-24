@@ -76,10 +76,10 @@
     <Compile Include="ViewModel\BaseUnitViewModel.cs" />
     <Compile Include="ViewModel\Bird.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="ViewModel\PipeViewModel.cs" />
+    <Compile Include="ViewModel\SurfaceViewModel.cs" />
     <Compile Include="ViewModel\PositionChangedEventArgs.cs" />
-    <Compile Include="ViewModel\RemoveSurfaceMessage.cs" />
-    <Compile Include="ViewModel\UnitMovedMessage.cs" />
+    <Compile Include="Message\RemoveSurfaceMessage.cs" />
+    <Compile Include="Message\UnitMovedMessage.cs" />
     <Compile Include="ViewModel\Vertices.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="MainWindow.xaml">

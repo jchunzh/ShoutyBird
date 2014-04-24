@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Documents;
+using ShoutyBird.Message;
 using ShoutyCopter;
 
 namespace ShoutyBird.ViewModel

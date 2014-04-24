@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
+using ShoutyBird.Message;
 using ShoutyCopter;
 
 namespace ShoutyBird.ViewModel

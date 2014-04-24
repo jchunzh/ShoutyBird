@@ -1,4 +1,6 @@
-﻿namespace ShoutyBird.ViewModel
+﻿using ShoutyBird.Message;
+
+namespace ShoutyBird.ViewModel
 {
     public class SurfaceViewModel : BaseUnitViewModel
     {

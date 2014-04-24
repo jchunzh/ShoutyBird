@@ -15,7 +15,9 @@
     <Window.Resources>
         <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
     </Window.Resources>
-    <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}">
+    <Canvas>
+        <TextBlock Text="{Binding Score, StringFormat=Score: \{0\}}" Canvas.ZIndex="99"/>
+        <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}" Canvas.ZIndex="98">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="KeyDown">
                     <cmd:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
@@ -34,4 +36,5 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+    </Canvas>
 </Window>

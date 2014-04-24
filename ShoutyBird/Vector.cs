@@ -1,4 +1,4 @@
-﻿namespace ShoutyCopter
+﻿namespace ShoutyBird
 {
     public struct Vector
     {
@@ -8,6 +8,11 @@
         public static Vector operator +(Vector a, Vector b)
         {
             return new Vector {X = a.X + b.X, Y = a.Y + b.Y};
+        }
+
+        public static Vector Zero
+        {
+            get { return new Vector {X = 0, Y = 0}; }
         }
     }
 }

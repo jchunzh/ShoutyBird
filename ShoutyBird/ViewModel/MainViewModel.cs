@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
 using System.Windows.Input;
 using System.Windows.Media;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using ShoutyBird.Message;
-using ShoutyCopter;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Timer = System.Windows.Forms.Timer;
 
 namespace ShoutyBird.ViewModel
@@ -46,6 +45,7 @@ namespace ShoutyBird.ViewModel
         private readonly Queue<BaseUnitViewModel> _unitsToRemove = new Queue<BaseUnitViewModel>();
 
         private ObservableCollection<BaseUnitViewModel> _unitCollection;
+        private readonly Random _random;
 
         /// <summary>
         /// In ingame units
@@ -56,16 +56,23 @@ namespace ShoutyBird.ViewModel
         /// </summary>
         private readonly double _screenHeight;
         private readonly double _scale;
-        //Pipe width / scren width
+        //Pipe width / screen width
         private const double PipeWidthFactor = 0.1835;
         //Bird width / screen width
         private const double BirdWidthFactor = 0.1089;
         //Bird height / screen height
         private const double BirdHeightFactor = 0.0695;
         private const double BirdJumpSpeed = -100;
-
-        //Pipe speed is about 37.9% of the screen width per second
+        //Fraction of pipe height the pipe gap is
+        private const double PipeGapFactor = 0.352;
+        //Fraction of screen width the space between each set of pipes
+        private const double PipeSpaceFactor = 0.393;
+        /// <summary>
+        /// Pipe speed is about 37.9% of the screen width per second
+        /// </summary>
         private const double PipeSpeedFactor = -0.379;
+        //Fraction of screen height the floor is
+        private const double FloorHeightFactor = 0.239;
 
         public ObservableCollection<BaseUnitViewModel> UnitCollection
         {
@@ -89,10 +96,22 @@ namespace ShoutyBird.ViewModel
             }
         }
 
+        public int Score
+        {
+            get { return _score; }
+            set
+            {
+                if (_score == value) return;
+                _score = value;
+                RaisePropertyChanged("Score");
+            }
+        }
+
         public RelayCommand<KeyEventArgs> Move { get; private set; }
 
         public MainViewModel(double screenWidth, double screenHeight)
         {
+            _random = new Random(0);
             _scale = 10;
             _screenWidth = ToGameUnits(screenWidth, _scale);
             _screenHeight = ToGameUnits(screenHeight, _scale);
@@ -103,6 +122,7 @@ namespace ShoutyBird.ViewModel
                           };
             _worldTimer.Tick += Tick;
             _worldTimer.Start();
+            //CreateBird
             Bird = new Bird(BirdJumpSpeed)
                    {
                        BackgroundBrush = new SolidColorBrush(Colors.Red), 
@@ -117,16 +137,36 @@ namespace ShoutyBird.ViewModel
                                 Y = (_screenHeight + Bird.Height)/8
                             };
             Bird.Collision += (sender, unit) => Pause();
-            UnitCollection = new ObservableCollection<BaseUnitViewModel>();
+
+            SurfaceViewModel floor = new SurfaceViewModel
+                                     {
+                                         Velocity = Vector.Zero,
+                                         Width = _screenWidth,
+                                         Height = _screenHeight* FloorHeightFactor,
+                                         Position = new Vector {X = 0, Y = _screenHeight*(1 - FloorHeightFactor)},
+                                         ScaleFactor = _scale,
+                                         BackgroundBrush = new SolidColorBrush(Colors.SandyBrown)
+                                     };
+            floor.Collision += (sender, unit) =>
+                               {
+                                   //Only collide with the bird
+                                   if (unit.GetType() != typeof (Bird)) return;
+
+                                   Pause();
+                               };
+
+            //When user hits jump key
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
 
             Messenger.Default.Register<RemoveSurfaceMessage>(this, RemovePipeMessageRecieved);
 
-            UnitCollection.CollectionChanged += (sender, args) => 
+            UnitCollection = new ObservableCollection<BaseUnitViewModel>();
+            UnitCollection.CollectionChanged += (sender, args) =>
                 RaisePropertyChanged("UnitCollection");
 
             CreatePipe();
             UnitCollection.Add(Bird);
+            UnitCollection.Add(floor);
         }
 
         private void RemovePipeMessageRecieved(RemoveSurfaceMessage message)
@@ -138,9 +178,9 @@ namespace ShoutyBird.ViewModel
             }
         }
 
-        /// <summary>
-        /// Update the unit's acceleration, velocity, and position
-        /// </summary>
+        private double _distancePassed = 0;
+        private int _score;
+
         private void Tick(object state, EventArgs e)
         {
             if (_isBusy) return;
@@ -152,6 +192,13 @@ namespace ShoutyBird.ViewModel
                 unit.Update(TimerTick);
             }
 
+            //allow screen width * PipeSpaceFactor distance pass before making a new pipe
+            if (_distancePassed >= PipeSpaceFactor*_screenWidth)
+            {
+                _distancePassed = 0;
+                CreatePipe();
+            }
+
             lock (removeQueueLock)
             {
                 if (_unitsToRemove.Count > 0)
@@ -161,30 +208,49 @@ namespace ShoutyBird.ViewModel
                 }
             }
 
+            _distancePassed += Math.Abs(PipeSpeedFactor) * _screenWidth * TimerTick / 1000d;
             _time += TimerTick;
             _isBusy = false;
         }
 
         private void CreatePipe()
         {
-            SurfaceViewModel surface = new SurfaceViewModel
+            double pipeHeightFactor = GetRandomPipeHeightFactor();
+            //Screen height that pipes can be at
+            double pipeScreenHeight = _screenHeight*(1 - FloorHeightFactor);
+            double topPipeHeight = pipeScreenHeight*pipeHeightFactor;
+            double bottomPipeHeight = pipeScreenHeight*(1 - pipeHeightFactor - PipeGapFactor);
+            double bottomPipeYPos = (PipeGapFactor + pipeHeightFactor)*pipeScreenHeight;
+
+            SurfaceViewModel topPipe = new SurfaceViewModel
             {
                 Position = new Vector { X = _screenWidth + 1, Y = 0 },
                 Width = _screenWidth * PipeWidthFactor,
-                Height = 10,
+                Height = topPipeHeight,
                 ScaleFactor = _scale,
                 BackgroundBrush = new SolidColorBrush(Colors.Green),
                 Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
             };
-            surface.Collision += (s, e) =>
+            topPipe.Collision += (s, e) =>
             {
-                if (e.GetType() == typeof(Bird))
-                {
-                    Pause();
-                }
+                //only collide with bird
+                if (e.GetType() != typeof(Bird)) return;
+                Pause();
             };
 
-            surface.PositionChanged += (sender, args) =>
+            //Score
+            topPipe.PositionChanged += (sender, args) =>
+                                       {
+                                           var pipe = (SurfaceViewModel) sender;
+
+                                           if (args.PreviousPosition.X + (pipe.Width / 2) > Bird.Position.X + (Bird.Width/2) &&
+                                               args.NewPosition.X + (pipe.Width / 2) <= Bird.Position.X + (Bird.Width/2))
+                                           {
+                                               Score++;
+                                           }
+                                       };
+
+            topPipe.PositionChanged += (sender, args) =>
                                       {
                                           SurfaceViewModel p = (SurfaceViewModel)sender;
                                           if (p.Vertices.X2 < -10)
@@ -194,7 +260,23 @@ namespace ShoutyBird.ViewModel
                                           }
                                       };
 
-            UnitCollection.Add(surface);
+            SurfaceViewModel bottomPipe = new SurfaceViewModel
+                                          {
+                                              Position = new Vector { X = _screenWidth + 1, Y = bottomPipeYPos },
+                                              Width = _screenWidth * PipeWidthFactor,
+                                              Height = bottomPipeHeight,
+                                              ScaleFactor = _scale,
+                                              BackgroundBrush = new SolidColorBrush(Colors.Green),
+                                              Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
+                                          };
+            bottomPipe.Collision += (s, e) =>
+                                    {
+                                        if (e.GetType() != typeof (Bird)) return;
+                                        Pause();
+                                    };
+
+            UnitCollection.Add(topPipe);
+            UnitCollection.Add(bottomPipe);
         }
 
         private void MoveExecute(KeyEventArgs keyEvent)
@@ -213,6 +295,16 @@ namespace ShoutyBird.ViewModel
         private double ToGameUnits(double displayUnit, double scale)
         {
             return displayUnit / scale;
+        }
+
+        /// <summary>
+        /// Double is between 0.1 and 1.0 - PipeGapFactor - 0.1
+        /// </summary>
+        /// <returns></returns>
+        private double GetRandomPipeHeightFactor()
+        {
+            int randNum = _random.Next(50, 1000 - (int)(PipeGapFactor * 1000) - 50);
+            return randNum/1000d;
         }
     }
 }

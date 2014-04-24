@@ -31,7 +31,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border Width="{Binding DisplayWidth}" Height="{Binding DisplayHeight}" Margin="{Binding DisplayPosition, Converter={StaticResource PositionToMarginConverter}}">
-                        <shoutyBird:UnitUserControl BackgroundBrush="{Binding BackgroundBrush}"/>
+                        <shoutyBird:UnitUserControl DataContext="{Binding}"/>
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

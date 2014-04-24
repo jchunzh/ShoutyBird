@@ -3,12 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:viewModel="clr-namespace:ShoutyBird.ViewModel"
              xmlns:shoutyBird="clr-namespace:ShoutyBird"
+             xmlns:viewModel="clr-namespace:ShoutyBird.ViewModel"
              mc:Ignorable="d" 
              Width="Auto"
              Height="Auto"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Canvas Background="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type shoutyBird:UnitUserControl}}, Path=BackgroundBrush}">
-    </Canvas>
+             d:DesignHeight="300" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance viewModel:BaseUnitViewModel}">
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type viewModel:Bird}">
+            <Image Source="Images/Penguins.jpg" Stretch="UniformToFill"></Image>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModel:SurfaceViewModel}">
+            <Image Source="Images/Jellyfish.jpg" Stretch="UniformToFill"></Image>
+        </DataTemplate>
+    </UserControl.Resources>
+    <ContentPresenter Content="{Binding}"/>
 </UserControl>

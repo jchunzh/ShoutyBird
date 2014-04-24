@@ -13,23 +13,5 @@ namespace ShoutyBird
         {
             InitializeComponent();
         }
-
-        public static readonly DependencyProperty CanvasColorProperty = DependencyProperty.Register("CanvasColor", typeof (Color),
-            typeof (UnitUserControl), new PropertyMetadata(default(Color)));
-
-        public static readonly DependencyProperty BackgroundBrushProperty = DependencyProperty.Register("BackgroundBrush", typeof(Brush),
-            typeof (UnitUserControl), new PropertyMetadata(default(Brush)));
-
-        public Brush BackgroundBrush
-        {
-            get { return (Brush) GetValue(BackgroundBrushProperty); }
-            set { SetValue(BackgroundBrushProperty, value);}
-        }
-
-        public Color CanvasColor
-        {
-            get { return (Color)GetValue(CanvasColorProperty); }
-            set { SetValue(CanvasColorProperty, value); }
-        }
     }
 }

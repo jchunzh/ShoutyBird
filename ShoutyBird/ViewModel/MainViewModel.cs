@@ -125,7 +125,6 @@ namespace ShoutyBird.ViewModel
             //CreateBird
             Bird = new Bird(BirdJumpSpeed)
                    {
-                       BackgroundBrush = new SolidColorBrush(Colors.Red), 
                        Width = _screenWidth * BirdWidthFactor, 
                        Height = _screenHeight * BirdHeightFactor,
                        Acceleration = new Vector { X = 0, Y = Gravity},
@@ -145,7 +144,6 @@ namespace ShoutyBird.ViewModel
                                          Height = _screenHeight* FloorHeightFactor,
                                          Position = new Vector {X = 0, Y = _screenHeight*(1 - FloorHeightFactor)},
                                          ScaleFactor = _scale,
-                                         BackgroundBrush = new SolidColorBrush(Colors.SandyBrown)
                                      };
             floor.Collision += (sender, unit) =>
                                {
@@ -225,13 +223,12 @@ namespace ShoutyBird.ViewModel
             double bottomPipeHeight = pipeScreenHeight*(1 - pipeHeightFactor - PipeGapFactor);
             double bottomPipeYPos = (PipeGapFactor + pipeHeightFactor)*pipeScreenHeight;
 
-            SurfaceViewModel topPipe = new SurfaceViewModel
+            PipeViewModel topPipe = new PipeViewModel
             {
                 Position = new Vector { X = _screenWidth + 1, Y = 0 },
                 Width = _screenWidth * PipeWidthFactor,
                 Height = topPipeHeight,
                 ScaleFactor = _scale,
-                BackgroundBrush = new SolidColorBrush(Colors.Green),
                 Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
             };
             topPipe.Collision += (s, e) =>
@@ -263,13 +260,12 @@ namespace ShoutyBird.ViewModel
                                           }
                                       };
 
-            SurfaceViewModel bottomPipe = new SurfaceViewModel
+            PipeViewModel bottomPipe = new PipeViewModel
                                           {
                                               Position = new Vector { X = _screenWidth + 1, Y = bottomPipeYPos },
                                               Width = _screenWidth * PipeWidthFactor,
                                               Height = bottomPipeHeight,
                                               ScaleFactor = _scale,
-                                              BackgroundBrush = new SolidColorBrush(Colors.Green),
                                               Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
                                           };
             bottomPipe.Collision += (s, e) =>

@@ -17,22 +17,10 @@ namespace ShoutyBird.ViewModel
         private double _width;
         private double _height;
         private Vector _velocity;
-        private Brush _backgroundBrush;
 
         public event CollisionEventHandler Collision;
         public event PositionChangedEventHandler PositionChanged;
         public event EventHandler Updated;
-
-        public Brush BackgroundBrush
-        {
-            get { return _backgroundBrush; }
-            set
-            {
-                if (Equals(_backgroundBrush, value)) return;
-                _backgroundBrush = value;
-                RaisePropertyChanged("BackgroundBrush");
-            }
-        }
 
         public double ScaleFactor
         {

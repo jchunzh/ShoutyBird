@@ -12,10 +12,15 @@
              d:DataContext="{d:DesignInstance viewModel:BaseUnitViewModel}">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type viewModel:Bird}">
-            <Image Source="Images/Penguins.jpg" Stretch="UniformToFill"></Image>
+            <!--<Image Source="Images/Penguins.jpg" Stretch="UniformToFill"></Image>-->
+            <Canvas Background="Red"></Canvas>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModel:SurfaceViewModel}">
-            <Image Source="Images/Jellyfish.jpg" Stretch="UniformToFill"></Image>
+            <!--<Image Source="Images/Jellyfish.jpg" Stretch="UniformToFill"></Image>-->
+            <Canvas Background="SandyBrown"></Canvas>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModel:PipeViewModel}">
+            <Canvas Background="Green"/>
         </DataTemplate>
     </UserControl.Resources>
     <ContentPresenter Content="{Binding}"/>

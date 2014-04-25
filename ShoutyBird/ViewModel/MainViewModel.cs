@@ -171,6 +171,22 @@ namespace ShoutyBird.ViewModel
                                    Pause();
                                };
 
+            SurfaceViewModel ceiling = new SurfaceViewModel
+            {
+                Velocity = Vector.Zero,
+                Width = _screenWidth,
+                Height = 10,
+                Position = new Vector { X = 0, Y = -9.6 },
+                ScaleFactor = _scale,
+            };
+            ceiling.Collision += (sender, unit) =>
+            {
+                //Only collide with the bird
+                if (unit.GetType() != typeof(Bird)) return;
+
+                Pause();
+            };
+
             //When user hits jump key
             Move = new RelayCommand<KeyEventArgs>(MoveExecute);
 
@@ -180,9 +196,10 @@ namespace ShoutyBird.ViewModel
             UnitCollection.CollectionChanged += (sender, args) =>
                 RaisePropertyChanged("UnitCollection");
 
-            CreatePipe();
             UnitCollection.Add(Bird);
             UnitCollection.Add(floor);
+            UnitCollection.Add(ceiling);
+            CreatePipe();
         }
 
         private void SetupAudio()
@@ -212,6 +229,7 @@ namespace ShoutyBird.ViewModel
 
             for (int index = 0; index < waveInEventArgs.BytesRecorded; index += 2)
             {
+                //Converts 2 bytes to a short
                 short sample = (short)((buffer[index + 1] << 8) |
                                         buffer[index + 0]);
                 float sample32 = sample / 32768f;

@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using NAudio.Wave;
 using ShoutyBird.Message;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Timer = System.Windows.Forms.Timer;
@@ -46,6 +48,7 @@ namespace ShoutyBird.ViewModel
 
         private ObservableCollection<BaseUnitViewModel> _unitCollection;
         private readonly Random _random;
+        private readonly WaveIn _waveIn = new WaveIn();
 
         /// <summary>
         /// In ingame units
@@ -62,7 +65,8 @@ namespace ShoutyBird.ViewModel
         private const double BirdWidthFactor = 0.1089;
         //Bird height / screen height
         private const double BirdHeightFactor = 0.0695;
-        private const double BirdJumpSpeed = -100;
+        private const double BirdJumpSpeed = 20;
+        private const double MinBirdJumpFactor = 0.05;
         //Fraction of pipe height the pipe gap is
         private const double PipeGapFactor = 0.352;
         //Fraction of screen width the space between each set of pipes
@@ -107,10 +111,24 @@ namespace ShoutyBird.ViewModel
             }
         }
 
+        public float Volumn
+        {
+            get { return _volumn; }
+            set
+            {
+                if (_volumn == value) return;
+                _volumn = value;
+
+                RaisePropertyChanged("Volumn");
+            }
+        }
+
         public RelayCommand<KeyEventArgs> Move { get; private set; }
 
         public MainViewModel(double screenWidth, double screenHeight)
         {
+            SetupAudio();
+
             _random = new Random(0);
             _scale = 10;
             _screenWidth = ToGameUnits(screenWidth, _scale);
@@ -123,7 +141,7 @@ namespace ShoutyBird.ViewModel
             _worldTimer.Tick += Tick;
             _worldTimer.Start();
             //CreateBird
-            Bird = new Bird(BirdJumpSpeed)
+            Bird = new Bird(BirdJumpSpeed, MinBirdJumpFactor)
                    {
                        Width = _screenWidth * BirdWidthFactor, 
                        Height = _screenHeight * BirdHeightFactor,
@@ -167,6 +185,43 @@ namespace ShoutyBird.ViewModel
             UnitCollection.Add(floor);
         }
 
+        private void SetupAudio()
+        {
+            int waveInDevices = WaveIn.DeviceCount;
+
+            int selectedDevice = -1;
+            for (int i = 0; i < waveInDevices; i++)
+            {
+                WaveInCapabilities deviceInfo = WaveIn.GetCapabilities(i);
+            }
+
+            selectedDevice = 0;
+
+            _waveIn.DeviceNumber = selectedDevice;
+            _waveIn.DataAvailable += WaveInOnDataAvailable;
+            _waveIn.WaveFormat = new WaveFormat(8000, 1);
+
+            _waveIn.StartRecording();
+        }
+
+        private void WaveInOnDataAvailable(object sender, WaveInEventArgs waveInEventArgs)
+        {
+            //int sum = 0;
+            byte[] buffer = waveInEventArgs.Buffer;
+            List<float> list = new List<float>();
+
+            for (int index = 0; index < waveInEventArgs.BytesRecorded; index += 2)
+            {
+                short sample = (short)((buffer[index + 1] << 8) |
+                                        buffer[index + 0]);
+                float sample32 = sample / 32768f;
+                list.Add(sample32);
+            }
+
+            Volumn = list.Max(s => s);
+            Bird.QueueJump(Volumn);
+        }
+
         private void RemovePipeMessageRecieved(RemoveSurfaceMessage message)
         {
             //Event is fired on not the main thread (maybe?). Just in case, add unit to list of units to remove
@@ -181,6 +236,7 @@ namespace ShoutyBird.ViewModel
         /// </summary>
         private double _distancePassed = 0;
         private int _score;
+        private float _volumn;
 
         private void Tick(object state, EventArgs e)
         {
@@ -282,13 +338,13 @@ namespace ShoutyBird.ViewModel
         {
             if (keyEvent.Key == Key.Space)
             {
-                Bird.QueueJump();
+                Bird.QueueJump(1d);
             }
         }
 
         private void Pause()
         {
-            _worldTimer.Stop();
+            //_worldTimer.Stop();
         }
 
         private double ToGameUnits(double displayUnit, double scale)

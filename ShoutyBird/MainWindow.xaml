@@ -15,8 +15,9 @@
     <Window.Resources>
         <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
     </Window.Resources>
-    <Canvas Background="LightSkyBlue">
-        <shoutyBird:ScoreUserControl Score="{Binding Score}" Canvas.ZIndex="99"/>
+    <Canvas x:Name="BackgroundCanvas" Background="LightSkyBlue">
+        <shoutyBird:VolumeMeterUserControl MeterHeightFactor="{Binding Volumn}" Width="50" Height="100" Canvas.ZIndex="99"/>
+        <shoutyBird:ScoreUserControl Score="{Binding Score}" Canvas.ZIndex="99" Canvas.Top="75" Canvas.Left="315"/>
         <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}" Canvas.ZIndex="98">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="KeyDown">

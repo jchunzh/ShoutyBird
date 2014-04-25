@@ -344,7 +344,7 @@ namespace ShoutyBird.ViewModel
 
         private void Pause()
         {
-            //_worldTimer.Stop();
+            _worldTimer.Stop();
         }
 
         private double ToGameUnits(double displayUnit, double scale)

@@ -15,7 +15,7 @@
     <Window.Resources>
         <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
     </Window.Resources>
-    <Canvas>
+    <Canvas Background="LightSkyBlue">
         <shoutyBird:ScoreUserControl Score="{Binding Score}" Canvas.ZIndex="99"/>
         <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}" Canvas.ZIndex="98">
             <i:Interaction.Triggers>

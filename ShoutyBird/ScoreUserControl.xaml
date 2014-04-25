@@ -6,7 +6,19 @@
              xmlns:shoutyBird="clr-namespace:ShoutyBird"
              mc:Ignorable="d" 
              d:DesignHeight="50" d:DesignWidth="200">
-    <Canvas>
-        <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type shoutyBird:ScoreUserControl}}, Path=Score, StringFormat=Score: \{0\}}"/>
-    </Canvas>
+    <Border Width="30" Height="30">
+        <Grid>
+            <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type shoutyBird:ScoreUserControl}}, Path=Score}" FontSize="26" Foreground="Black" FontWeight="UltraBold" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock.RenderTransform>
+                    <ScaleTransform ScaleX="1.5" ScaleY="1.5" CenterX="0" CenterY="0"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+            
+            <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type shoutyBird:ScoreUserControl}}, Path=Score}" FontSize="26" Foreground="White">
+                <TextBlock.RenderTransform>
+                    <TranslateTransform X="12" Y="8"></TranslateTransform>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+        </Grid>
+    </Border>
 </UserControl>

@@ -15,7 +15,7 @@
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 
-namespace ShoutyBird.ViewModel
+namespace ShoutyBird.ViewModels
 {
     /// <summary>
     /// This class contains static references to all the view models in the

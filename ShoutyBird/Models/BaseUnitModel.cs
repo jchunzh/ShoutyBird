@@ -1,37 +1,21 @@
 ﻿using System;
-using System.Windows.Media;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 using ShoutyBird.Message;
-using ShoutyCopter;
+using ShoutyBird.ViewModels;
 
-namespace ShoutyBird.ViewModel
+namespace ShoutyBird.Models
 {
-    public delegate void CollisionEventHandler(object sender, BaseUnitViewModel collidingUnit);
+    public delegate void CollisionEventHandler(object sender, BaseUnitModel collidingUnit);
     public delegate void PositionChangedEventHandler(object sender, PositionChangedEventArgs e);
 
-    public abstract class BaseUnitViewModel : ViewModelBase, IDisposable
+    public abstract class BaseUnitModel : IDisposable
     {
         private Vector _position;
-        private double _scaleFactor;
-        private double _width;
-        private double _height;
-        private Vector _velocity;
-
         public event CollisionEventHandler Collision;
         public event PositionChangedEventHandler PositionChanged;
         public event EventHandler Updated;
 
-        public double ScaleFactor
-        {
-            get { return _scaleFactor; }
-            set
-            {
-                if (_scaleFactor == value) return;
-                _scaleFactor = value;
-                RaisePropertyChanged("ScaleFactor");
-            }
-        }
+        public double ScaleFactor { get; set; }
 
         public Vector DisplayPosition
         {
@@ -55,55 +39,21 @@ namespace ShoutyBird.ViewModel
             get { return _position; }
             set
             {
-                if (Equals(_position, value)) return;
-                Vector prevPosition = _position;
                 _position = value;
                 UpdateVertices();
-                RaisePropertyChanged("DisplayPosition");
-
-                OnPositionChanged(prevPosition);
             }
         }
 
         /// <summary>
         /// In gameunits / second
         /// </summary>
-        public Vector Velocity
-        {
-            get { return _velocity; }
-            set
-            {
-                if (Equals(_velocity, value)) return;
-                _velocity = value;
-                RaisePropertyChanged("Velocity");
-            }
-        }
+        public Vector Velocity { get; set; }
 
         public Vector Acceleration { get; set; }
 
-        public double Width
-        {
-            get { return _width; }
-            set
-            {
-                if (_width == value) return;
-                _width = value;
-                UpdateVertices();
-                RaisePropertyChanged("DisplayWidth");
-            }
-        }
+        public double Width { get; set; }
 
-        public double Height
-        {
-            get { return _height; }
-            set
-            {
-                if (_height == value) return;
-                _height = value;
-                UpdateVertices();
-                RaisePropertyChanged("DisplayHeight");
-            }
-        }
+        public double Height { get; set; }
 
         public Vector ToDisplayUnits(Vector gameUnit)
         {
@@ -115,8 +65,11 @@ namespace ShoutyBird.ViewModel
             return gameUnit * ScaleFactor;
         }
 
-        protected BaseUnitViewModel()
+        public UnitViewModel ViewModel { get; private set; }
+
+        protected BaseUnitModel(UnitViewModel viewModel)
         {
+            ViewModel = viewModel;
             Updated += (sender, args) => Messenger.Default.Send(new UnitUpdateMessage(this));
             Messenger.Default.Register<UnitUpdateMessage>(this, UnitUpdateMessageRecieved);
         }
@@ -138,19 +91,23 @@ namespace ShoutyBird.ViewModel
 
         public virtual void Update(double timeInterval)
         {
-            OnUpdated();
-
             Velocity = new Vector
             {
                 X = CalculateVelocityChange(Acceleration.X, Velocity.X, timeInterval),
                 Y = CalculateVelocityChange(Acceleration.Y, Velocity.Y, timeInterval)
             };
 
+            Vector prevPosition = Position;
             Position = new Vector
             {
                 X = CacluatePositionChange(Acceleration.X, Velocity.X, Position.X, timeInterval),
                 Y = CacluatePositionChange(Acceleration.Y, Velocity.Y, Position.Y, timeInterval)
             };
+
+            if (Acceleration.X != 0 || Acceleration.Y != 0 || Velocity.X != 0 || Velocity.Y != 0)
+                OnPositionChanged(prevPosition);
+
+            OnUpdated();
         }
 
         /// <summary>
@@ -171,7 +128,7 @@ namespace ShoutyBird.ViewModel
             return acceleration * timeInterval / 1000 + velocity;
         }
 
-        protected void OnCollision(object sender, BaseUnitViewModel collidingUnit)
+        protected void OnCollision(object sender, BaseUnitModel collidingUnit)
         {
             if (Collision != null)
                 Collision(sender, collidingUnit);

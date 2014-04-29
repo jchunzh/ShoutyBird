@@ -7,10 +7,10 @@
       xmlns:shoutyBird="clr-namespace:ShoutyBird"
       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
       xmlns:command="http://www.galasoft.ch/mvvmlight"
-      xmlns:viewModel="clr-namespace:ShoutyBird.ViewModel"
+      xmlns:viewModels="clr-namespace:ShoutyBird.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300"
-      d:DataContext="{d:DesignInstance viewModel:MainViewModel}"
+      d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
       FocusManager.FocusedElement="{Binding ElementName=Display}"
 	Title="Game">
     <Page.Resources>
@@ -19,7 +19,7 @@
     <Canvas x:Name="BackgroundCanvas" Background="LightSkyBlue">
         <shoutyBird:VolumeMeterUserControl MeterHeightFactor="{Binding Volumn}" Width="50" Height="100" Canvas.ZIndex="99"/>
         <shoutyBird:ScoreUserControl Score="{Binding Score}" Canvas.ZIndex="99" Canvas.Top="75" Canvas.Left="315"/>
-        <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}" Canvas.ZIndex="98">
+        <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitViewModelCollection}" Canvas.ZIndex="98">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="KeyDown">
                     <command:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
@@ -32,7 +32,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Width="{Binding DisplayWidth}" Height="{Binding DisplayHeight}" Margin="{Binding DisplayPosition, Converter={StaticResource PositionToMarginConverter}}">
+                    <Border Width="{Binding Width}" Height="{Binding Height}" Margin="{Binding DisplayPosition, Converter={StaticResource PositionToMarginConverter}}">
                         <shoutyBird:UnitUserControl DataContext="{Binding}"/>
                     </Border>
                 </DataTemplate>

@@ -1,7 +1,6 @@
 ﻿using System;
-using ShoutyCopter;
 
-namespace ShoutyBird.ViewModel
+namespace ShoutyBird.ViewModels
 {
     public class PositionChangedEventArgs : EventArgs
     {

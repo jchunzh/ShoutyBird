@@ -1,13 +1,13 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
-using ShoutyBird.ViewModel;
+using ShoutyBird.Models;
 
 namespace ShoutyBird.Message
 {
     public class RemoveSurfaceMessage : MessageBase
     {
-        public BaseUnitViewModel Surface { get; private set; }
+        public BaseUnitModel Surface { get; private set; }
 
-        public RemoveSurfaceMessage(SurfaceViewModel surface)
+        public RemoveSurfaceMessage(SurfaceModel surface)
         {
             Surface = surface;
         }

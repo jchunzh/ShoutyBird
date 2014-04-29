@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Documents;
 using ShoutyBird.Message;
-using ShoutyCopter;
+using ShoutyBird.ViewModels;
+using Action = ShoutyBird.ViewModels.Action;
 
-namespace ShoutyBird.ViewModel
+namespace ShoutyBird.Models
 {
-    public class Bird : BaseUnitViewModel
+    public class BirdModel : BaseUnitModel
     {
         private readonly Queue<Action> _actionQueue = new Queue<Action>();
         //Fraction max jump speed to jump
@@ -15,7 +15,7 @@ namespace ShoutyBird.ViewModel
         private readonly double JumpSpeed;
         private readonly double MinJumpFactor;
 
-        public Bird(double maxJumpSpeed, double minJumpFactor)
+        public BirdModel(UnitViewModel viewModel, double maxJumpSpeed, double minJumpFactor) : base(viewModel)
         {
             JumpSpeed = maxJumpSpeed;
             MinJumpFactor = minJumpFactor;

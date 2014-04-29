@@ -1,13 +1,13 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
-using ShoutyBird.ViewModel;
+using ShoutyBird.Models;
 
 namespace ShoutyBird.Message
 {
     public class UnitUpdateMessage : MessageBase
     {
-        public BaseUnitViewModel Unit { get; private set; }
+        public BaseUnitModel Unit { get; private set; }
 
-        public UnitUpdateMessage(BaseUnitViewModel unit)
+        public UnitUpdateMessage(BaseUnitModel unit)
         {
             Unit = unit;
         }

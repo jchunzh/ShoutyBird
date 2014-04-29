@@ -84,17 +84,18 @@
       <DependentUpon>ScoreUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Vector.cs" />
-    <Compile Include="ViewModel\Action.cs" />
-    <Compile Include="ViewModel\BaseUnitViewModel.cs" />
-    <Compile Include="ViewModel\Bird.cs" />
-    <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="ViewModel\PipeViewModel.cs" />
-    <Compile Include="ViewModel\SurfaceViewModel.cs" />
-    <Compile Include="ViewModel\PositionChangedEventArgs.cs" />
+    <Compile Include="ViewModels\Action.cs" />
+    <Compile Include="Models\BaseUnitModel.cs" />
+    <Compile Include="Models\BirdModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="Models\PipeModel.cs" />
+    <Compile Include="Models\SurfaceModel.cs" />
+    <Compile Include="ViewModels\PositionChangedEventArgs.cs" />
     <Compile Include="Message\RemoveSurfaceMessage.cs" />
     <Compile Include="Message\UnitMovedMessage.cs" />
-    <Compile Include="ViewModel\Vertices.cs" />
-    <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="ViewModels\UnitViewModel.cs" />
+    <Compile Include="Models\Vertices.cs" />
+    <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="VolumeMeterUserControl.xaml.cs">
       <DependentUpon>VolumeMeterUserControl.xaml</DependentUpon>
     </Compile>
@@ -165,6 +166,7 @@
   <ItemGroup>
     <Resource Include="Images\Jellyfish.jpg" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

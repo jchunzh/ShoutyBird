@@ -1,17 +1,18 @@
 ﻿using ShoutyBird.Message;
+using ShoutyBird.ViewModels;
 
-namespace ShoutyBird.ViewModel
+namespace ShoutyBird.Models
 {
-    public class SurfaceViewModel : BaseUnitViewModel
+    public class SurfaceModel : BaseUnitModel
     {
-        public SurfaceViewModel()
+        public SurfaceModel(UnitViewModel viewModel) : base(viewModel)
         {
             
         }
 
         protected override void UnitUpdateMessageRecieved(UnitUpdateMessage message)
         {
-            if (message.Unit == this || message.Unit.GetType() != typeof(Bird)) return;
+            if (message.Unit == this || message.Unit.GetType() != typeof(BirdModel)) return;
             
             if (IsCollision(Vertices, message.Unit.Vertices))
             {

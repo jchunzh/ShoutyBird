@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ShoutyCopter;
-
-namespace ShoutyBird.ViewModel
+﻿namespace ShoutyBird.Models
 {
     public struct Vertices
     {

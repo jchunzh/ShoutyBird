@@ -1,4 +1,4 @@
-﻿namespace ShoutyBird.ViewModel
+﻿namespace ShoutyBird.ViewModels
 {
     public enum Action
     {

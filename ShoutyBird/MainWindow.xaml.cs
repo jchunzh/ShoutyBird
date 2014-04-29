@@ -11,7 +11,7 @@ namespace ShoutyBird
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new MainViewModel(Width, Height);
+            
         }
     }
 }

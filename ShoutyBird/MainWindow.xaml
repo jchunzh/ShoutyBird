@@ -3,39 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:cmd="http://www.galasoft.ch/mvvmlight"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:viewModel="clr-namespace:ShoutyBird.ViewModel"
         xmlns:shoutyBird="clr-namespace:ShoutyBird"
-        xmlns:converters="clr-namespace:ShoutyBird.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="640"
-        FocusManager.FocusedElement="{Binding ElementName=Display}"
-        d:DataContext="{d:DesignInstance viewModel:MainViewModel}">
-    <Window.Resources>
-        <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
-    </Window.Resources>
-    <Canvas x:Name="BackgroundCanvas" Background="LightSkyBlue">
-        <shoutyBird:VolumeMeterUserControl MeterHeightFactor="{Binding Volumn}" Width="50" Height="100" Canvas.ZIndex="99"/>
-        <shoutyBird:ScoreUserControl Score="{Binding Score}" Canvas.ZIndex="99" Canvas.Top="75" Canvas.Left="315"/>
-        <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitCollection}" Canvas.ZIndex="98">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="KeyDown">
-                    <cmd:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas IsItemsHost="True"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Width="{Binding DisplayWidth}" Height="{Binding DisplayHeight}" Margin="{Binding DisplayPosition, Converter={StaticResource PositionToMarginConverter}}">
-                        <shoutyBird:UnitUserControl DataContext="{Binding}"/>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </Canvas>
+        Title="MainWindow" Height="800" Width="640">
+    <shoutyBird:Game x:Name="Game"/>
 </Window>

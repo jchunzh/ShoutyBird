@@ -70,6 +70,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AudioMenu.xaml.cs">
+      <DependentUpon>AudioMenu.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\PositionToMarginConverter.cs" />
     <Compile Include="Game.xaml.cs">
       <DependentUpon>Game.xaml</DependentUpon>
@@ -90,9 +93,10 @@
     <Compile Include="Models\BirdModel.cs" />
     <Compile Include="ViewModels\AudioViewModel.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="Models\PipeModel.cs" />
     <Compile Include="Models\SurfaceModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\PositionChangedEventArgs.cs" />
     <Compile Include="Message\RemoveSurfaceMessage.cs" />
     <Compile Include="Message\UnitMovedMessage.cs" />
@@ -102,6 +106,10 @@
     <Compile Include="VolumeMeterUserControl.xaml.cs">
       <DependentUpon>VolumeMeterUserControl.xaml</DependentUpon>
     </Compile>
+    <Page Include="AudioMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Game.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

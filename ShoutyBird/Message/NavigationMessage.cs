@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Security.Cryptography;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 
 namespace ShoutyBird.Message
 {
     public class NavigationMessage : MessageBase
     {
-        public Uri DestinationUri { get; private set; }
-
-        public NavigationMessage(Uri destinationUri)
+        public Type DataContextType { get; private set; }
+        public NavigationMessage(Type viewModel)
         {
-            DestinationUri = destinationUri;
+            DataContextType = viewModel;
         }
     }
 }

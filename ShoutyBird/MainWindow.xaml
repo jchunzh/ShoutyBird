@@ -4,8 +4,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:shoutyBird="clr-namespace:ShoutyBird"
+        xmlns:viewModels="clr-namespace:ShoutyBird.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="640">
+        Title="MainWindow" Height="800" Width="640"
+        d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewModels:GameViewModel}">
+            <shoutyBird:Game></shoutyBird:Game>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:AudioViewModel}">
+            <shoutyBird:AudioMenu></shoutyBird:AudioMenu>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:MainMenuViewModel}">
+            <shoutyBird:MainMenu/>
+        </DataTemplate>
+    </Window.Resources>
     <!--<shoutyBird:Game x:Name="Game"/>-->
-    <Frame Source="MainMenu.xaml"/>
+    <!--<Frame Name="MainFrame" Source="MainMenu.xaml"/>-->
+    <!--<shoutyBird:MainMenu/>-->
+    <Grid>
+        <ContentPresenter Content="{Binding CurrentViewModel}"></ContentPresenter>
+    </Grid>
 </Window>

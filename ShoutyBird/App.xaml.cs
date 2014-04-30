@@ -1,6 +1,7 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 
-namespace ShoutyCopter
+namespace ShoutyBird
 {
     /// <summary>
     /// Interaction logic for App.xaml

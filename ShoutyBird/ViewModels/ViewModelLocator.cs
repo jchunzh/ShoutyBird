@@ -40,21 +40,31 @@ namespace ShoutyBird.ViewModels
             ////    // Create run time view services and models
             ////    SimpleIoc.Default.Register<IDataService, DataService>();
             ////}
+
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<MainMenuViewModel>();
+            SimpleIoc.Default.Register<AudioViewModel>();
+            SimpleIoc.Default.Register<GameViewModel>();
         }
 
         public MainViewModel Main
         {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<MainViewModel>();
-            }
+            get { return ServiceLocator.Current.GetInstance<MainViewModel>(); }
         }
 
         public MainMenuViewModel MainMenu
         {
             get { return ServiceLocator.Current.GetInstance<MainMenuViewModel>(); }
+        }
+
+        public AudioViewModel Audio
+        {
+            get { return ServiceLocator.Current.GetInstance<AudioViewModel>(); }
+        }
+
+        public GameViewModel Game
+        {
+            get { return ServiceLocator.Current.GetInstance<GameViewModel>(); }
         }
         
         public static void Cleanup()

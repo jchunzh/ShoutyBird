@@ -1,17 +1,15 @@
 ﻿using System.Windows.Controls;
-using ShoutyBird.ViewModels;
 
 namespace ShoutyBird
 {
     /// <summary>
-    /// Interaction logic for Game.xaml
+    /// Interaction logic for AudioMenu.xaml
     /// </summary>
-    public partial class Game : UserControl
+    public partial class AudioMenu : UserControl
     {
-        public Game()
+        public AudioMenu()
         {
             InitializeComponent();
-            Display.Focus();
         }
     }
 }

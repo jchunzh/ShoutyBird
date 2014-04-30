@@ -6,5 +6,6 @@
         xmlns:shoutyBird="clr-namespace:ShoutyBird"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="640">
-    <shoutyBird:Game x:Name="Game"/>
+    <!--<shoutyBird:Game x:Name="Game"/>-->
+    <Frame Source="MainMenu.xaml"/>
 </Window>

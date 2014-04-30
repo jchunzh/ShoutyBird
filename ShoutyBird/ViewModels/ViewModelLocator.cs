@@ -40,8 +40,8 @@ namespace ShoutyBird.ViewModels
             ////    // Create run time view services and models
             ////    SimpleIoc.Default.Register<IDataService, DataService>();
             ////}
-
             SimpleIoc.Default.Register<MainViewModel>();
+            SimpleIoc.Default.Register<MainMenuViewModel>();
         }
 
         public MainViewModel Main
@@ -50,6 +50,11 @@ namespace ShoutyBird.ViewModels
             {
                 return ServiceLocator.Current.GetInstance<MainViewModel>();
             }
+        }
+
+        public MainMenuViewModel MainMenu
+        {
+            get { return ServiceLocator.Current.GetInstance<MainMenuViewModel>(); }
         }
         
         public static void Cleanup()

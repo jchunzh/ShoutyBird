@@ -2,7 +2,6 @@
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Messaging;
 using ShoutyBird.Message;
-using System;
 
 namespace ShoutyBird.ViewModels
 {
@@ -21,14 +20,25 @@ namespace ShoutyBird.ViewModels
             }
         }
 
+        private ViewModelBase _prevViewModel { get; set; }
+
         public MainViewModel()
         {
             Messenger.Default.Register<NavigationMessage>(this, NavigationMessageRecieved);
+            Messenger.Default.Register<NavigateBackMessage>(this, NavigateBackMessageRecieved);
             CurrentViewModel = SimpleIoc.Default.GetInstance(typeof (MainMenuViewModel)) as ViewModelBase;
+        }
+
+        private void NavigateBackMessageRecieved(NavigateBackMessage obj)
+        {
+            ViewModelBase temp = CurrentViewModel;
+            CurrentViewModel = _prevViewModel;
+            _prevViewModel = temp;
         }
 
         private void NavigationMessageRecieved(NavigationMessage obj)
         {
+            _prevViewModel = CurrentViewModel;
             CurrentViewModel = SimpleIoc.Default.GetInstance(obj.DataContextType) as ViewModelBase;
         }
     }

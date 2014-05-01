@@ -126,10 +126,11 @@ namespace ShoutyBird.ViewModels
 
         public RelayCommand<KeyEventArgs> Move { get; private set; }
 
-        public GameViewModel(double screenWidth, double screenHeight)
+        public GameViewModel()
         {
             //SetupAudio();
-
+            double screenWidth = 640;
+            double screenHeight = 800;
             _random = new Random(0);
             _scale = 10;
             _screenWidth = ToGameUnits(screenWidth, _scale);

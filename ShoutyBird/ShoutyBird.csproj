@@ -80,6 +80,7 @@
     <Compile Include="MainMenu.xaml.cs">
       <DependentUpon>MainMenu.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Message\NavigateBackMessage.cs" />
     <Compile Include="Message\NavigationMessage.cs" />
     <Compile Include="UnitUserControl.xaml.cs">
       <DependentUpon>UnitUserControl.xaml</DependentUpon>

@@ -1,6 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Forms;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using NAudio.Wave;
+using ShoutyBird.Message;
 
 namespace ShoutyBird.ViewModels
 {
@@ -28,6 +32,8 @@ namespace ShoutyBird.ViewModels
             }
         }
 
+        public RelayCommand NavigateBack { get; set; }
+
         private WaveInCapabilities _selectedDevice;
         private ObservableCollection<WaveInCapabilities> _deviceCollection;
 
@@ -35,6 +41,7 @@ namespace ShoutyBird.ViewModels
         {
             DeviceCollection = new ObservableCollection<WaveInCapabilities>();
             DeviceCollection.CollectionChanged += (sender, args) => RaisePropertyChanged("DeviceCollection");
+            NavigateBack = new RelayCommand(() => Messenger.Default.Send(new NavigateBackMessage()));
             GetAudioDevices();
         }
 

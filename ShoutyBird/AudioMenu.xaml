@@ -9,7 +9,11 @@
       DataContext="{Binding Audio, Source={StaticResource Locator}}"
       d:DataContext="{d:DesignInstance viewModels:AudioViewModel}">
     <Grid>
-        <ListBox ItemsSource="{Binding DeviceCollection}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ListBox Grid.Row="0"  ItemsSource="{Binding DeviceCollection}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Style.Triggers>
@@ -27,5 +31,6 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <Button Grid.Row="1" Content="Back" Command="{Binding NavigateBack}"></Button>
     </Grid>
 </UserControl>

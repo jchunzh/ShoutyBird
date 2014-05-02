@@ -1,5 +1,4 @@
 ﻿using System.Windows.Controls;
-using ShoutyBird.ViewModels;
 
 namespace ShoutyBird
 {

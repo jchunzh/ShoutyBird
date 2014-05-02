@@ -20,11 +20,6 @@
         <shoutyBird:VolumeMeterUserControl MeterHeightFactor="{Binding Volumn}" Width="50" Height="100" Canvas.ZIndex="99"/>
         <shoutyBird:ScoreUserControl Score="{Binding Score}" Canvas.ZIndex="99" Canvas.Top="75" Canvas.Left="315"/>
         <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitViewModelCollection}" Canvas.ZIndex="98">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="KeyDown">
-                    <command:EventToCommand Command="{Binding Move}" PassEventArgsToCommand="True"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Canvas IsItemsHost="True"/>

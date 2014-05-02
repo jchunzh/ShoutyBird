@@ -124,8 +124,6 @@ namespace ShoutyBird.ViewModels
             }
         }
 
-        public RelayCommand<KeyEventArgs> Move { get; private set; }
-
         public GameViewModel()
         {
             //SetupAudio();
@@ -204,7 +202,7 @@ namespace ShoutyBird.ViewModels
             ceilingViewModel.Height = ceiling.DisplayHeight;
 
             //When user hits jump key
-            Move = new RelayCommand<KeyEventArgs>(MoveExecute);
+            Messenger.Default.Register<KeyDownMessage>(this, KeyDownMessageRecieved);
 
             Messenger.Default.Register<RemoveSurfaceMessage>(this, RemovePipeMessageRecieved);
 
@@ -229,6 +227,12 @@ namespace ShoutyBird.ViewModels
             };
             _worldTimer.Tick += Tick;
             _worldTimer.Start();
+        }
+
+        private void KeyDownMessageRecieved(KeyDownMessage obj)
+        {
+            if (obj.Key == Key.Space)
+                Bird.QueueJump(0.5);
         }
 
         private void WaveInOnDataAvailable(object sender, WaveInEventArgs waveInEventArgs)

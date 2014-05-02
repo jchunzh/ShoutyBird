@@ -5,6 +5,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:shoutyBird="clr-namespace:ShoutyBird"
         xmlns:viewModels="clr-namespace:ShoutyBird.ViewModels"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:command="http://www.galasoft.ch/mvvmlight"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="640"
         d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
@@ -24,6 +26,11 @@
     <!--<shoutyBird:Game x:Name="Game"/>-->
     <!--<Frame Name="MainFrame" Source="MainMenu.xaml"/>-->
     <!--<shoutyBird:MainMenu/>-->
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="KeyDown">
+            <command:EventToCommand Command="{Binding KeyDown}" PassEventArgsToCommand="True"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid>
         <ContentPresenter Name="Content" Content="{Binding CurrentViewModel}"></ContentPresenter>
     </Grid>

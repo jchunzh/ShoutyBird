@@ -7,6 +7,19 @@ namespace ShoutyBird.ViewModels
         private Vector _displayPosition;
         private double _width;
         private double _height;
+        private UnitType _type;
+
+        public UnitType Type
+        {
+            get { return _type; }
+            set
+            {
+                if (_type == value) return;
+                _type = value;
+
+                RaisePropertyChanged("Type");
+            }
+        }
 
         public Vector DisplayPosition
         {

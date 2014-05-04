@@ -81,6 +81,7 @@
       <DependentUpon>MainMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="Message\AudioVolumnMessage.cs" />
+    <Compile Include="Message\GameStatusMessage.cs" />
     <Compile Include="Message\KeyDownMessage.cs" />
     <Compile Include="Message\NavigateBackMessage.cs" />
     <Compile Include="Message\NavigationMessage.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Models\BaseUnitModel.cs" />
     <Compile Include="Models\BirdModel.cs" />
     <Compile Include="ViewModels\AudioViewModel.cs" />
+    <Compile Include="ViewModels\GameStatus.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="Models\PipeModel.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="ViewModels\PositionChangedEventArgs.cs" />
     <Compile Include="Message\RemoveSurfaceMessage.cs" />
     <Compile Include="Message\UnitMovedMessage.cs" />
+    <Compile Include="ViewModels\UnitType.cs" />
     <Compile Include="ViewModels\UnitViewModel.cs" />
     <Compile Include="Models\Vertices.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />

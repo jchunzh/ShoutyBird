@@ -9,7 +9,19 @@
              Height="Auto"
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance viewModels:UnitViewModel}">
-    <UserControl.Resources>
-    </UserControl.Resources>
-    <Canvas Background="Tan"></Canvas>
+    <Canvas>
+        <Canvas.Style>
+            <Style TargetType="Canvas">
+                <Setter Property="Background" Value="Tan"></Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Type}" Value="Bird">
+                        <Setter Property="Background" Value="DarkRed"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Type}" Value="Pipe">
+                        <Setter Property="Background" Value="Green"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Canvas.Style>
+    </Canvas>
 </UserControl>

@@ -8,7 +8,6 @@ using GalaSoft.MvvmLight.Messaging;
 using NAudio.Wave;
 using ShoutyBird.Message;
 using ShoutyBird.Models;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace ShoutyBird.ViewModels
 {
@@ -40,7 +39,7 @@ namespace ShoutyBird.ViewModels
         private readonly Timer _worldTimer;
         private BirdModel _bird;
 
-        private readonly object removeQueueLock = new object();
+        private readonly object _unitCollectionLock = new object();
         private readonly Queue<BaseUnitModel> _unitsToRemove = new Queue<BaseUnitModel>();
 
         private ObservableCollection<UnitViewModel> _unitViewModelCollection;
@@ -122,6 +121,8 @@ namespace ShoutyBird.ViewModels
             }
         }
 
+        public GameStatus Status { get; set; }
+
         public GameViewModel()
         {
             //SetupAudio();
@@ -141,14 +142,13 @@ namespace ShoutyBird.ViewModels
             UnitViewModelCollection = new ObservableCollection<UnitViewModel>();
             UnitViewModelCollection.CollectionChanged += (sender, args) =>
                 RaisePropertyChanged("UnitViewModelCollection");
-         
+
             //Needs to be Windows.Forms.Timer as the other timers are asynchronous
             _worldTimer = new Timer
             {
                 Interval = TimerTick,
             };
             _worldTimer.Tick += Tick;
-            _worldTimer.Start();
 
             SetupGame();
         }
@@ -168,7 +168,7 @@ namespace ShoutyBird.ViewModels
         private void RemovePipeMessageRecieved(RemoveSurfaceMessage message)
         {
             //Event is fired on not the main thread (maybe?). Just in case, add unit to list of units to remove
-            lock (removeQueueLock)
+            lock (_unitCollectionLock)
             {
                 _unitsToRemove.Enqueue(message.Surface);
             }
@@ -176,8 +176,12 @@ namespace ShoutyBird.ViewModels
 
         private void SetupGame()
         {
+            Status = GameStatus.Restarting;
+            _worldTimer.Stop();
+            _unitsToRemove.Clear();
             Score = 0;
             UnitViewModel birdViewModel = new UnitViewModel();
+            birdViewModel.Type = UnitType.Bird;
             Bird = new BirdModel(birdViewModel, BirdJumpSpeed, MinBirdJumpFactor)
             {
                 Width = _screenWidth * BirdWidthFactor,
@@ -229,18 +233,27 @@ namespace ShoutyBird.ViewModels
             ceilingViewModel.Width = ceiling.DisplayWidth;
             ceilingViewModel.Height = ceiling.DisplayHeight;
 
+            floorViewModel.Type = UnitType.Floor;
+            ceilingViewModel.Type = UnitType.Ceiling;
+
             //Reset collections
-            UnitCollection.Clear();
-            UnitViewModelCollection.Clear();
+            lock (_unitCollectionLock)
+            {
+                UnitCollection.Clear();
+                UnitViewModelCollection.Clear();
 
-            UnitCollection.Add(Bird);
-            UnitCollection.Add(floor);
-            UnitCollection.Add(ceiling);
+                UnitCollection.Add(Bird);
+                UnitCollection.Add(floor);
+                UnitCollection.Add(ceiling);
 
-            UnitViewModelCollection.Add(birdViewModel);
-            UnitViewModelCollection.Add(floorViewModel);
-            UnitViewModelCollection.Add(ceilingViewModel);
-            CreatePipe();
+                UnitViewModelCollection.Add(birdViewModel);
+                UnitViewModelCollection.Add(floorViewModel);
+                UnitViewModelCollection.Add(ceilingViewModel);
+                CreatePipe();
+            }
+
+            Status = GameStatus.Running;
+            _worldTimer.Start();
         }
 
         /// <summary>
@@ -252,23 +265,32 @@ namespace ShoutyBird.ViewModels
 
         private void Tick(object state, EventArgs e)
         {
+            if (Status == GameStatus.Restarting)
+                return;
+
             if (_isBusy) return;
 
             _isBusy = true;
 
-            foreach (var unit in UnitCollection)
+            lock (_unitCollectionLock)
             {
-                unit.Update(TimerTick);
+                foreach (var unit in UnitCollection)
+                {
+                    unit.Update(TimerTick);
+                }
             }
 
             //allow screen width * PipeSpaceFactor distance pass before making a new pipe
             if (_distancePassed >= PipeSpaceFactor*_screenWidth)
             {
                 _distancePassed = 0;
-                CreatePipe();
+                lock (_unitCollectionLock)
+                {
+                    CreatePipe();
+                }
             }
 
-            lock (removeQueueLock)
+            lock (_unitCollectionLock)
             {
                 while (_unitsToRemove.Count > 0)
                 {
@@ -358,6 +380,9 @@ namespace ShoutyBird.ViewModels
             };
             bottomPipe.Collision += NonBirdCollisionEvent;
 
+            topPipeViewModel.Type = UnitType.Pipe;
+            bottomPipeViewModel.Type = UnitType.Pipe;
+
             UnitCollection.Add(topPipe);
             UnitCollection.Add(bottomPipe);
             UnitViewModelCollection.Add(topPipeViewModel);
@@ -366,6 +391,7 @@ namespace ShoutyBird.ViewModels
 
         private void Pause()
         {
+            SetupGame();
             //_worldTimer.Stop();
         }
 

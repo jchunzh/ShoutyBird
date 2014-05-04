@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using NAudio.Wave;
 using ShoutyBird.Message;
@@ -133,93 +131,17 @@ namespace ShoutyBird.ViewModels
             _scale = 10;
             _screenWidth = ToGameUnits(screenWidth, _scale);
             _screenHeight = ToGameUnits(screenHeight, _scale);
-            //CreateBird
-            UnitViewModel birdViewModel = new UnitViewModel();
-            Bird = new BirdModel(birdViewModel, BirdJumpSpeed, MinBirdJumpFactor)
-                   {
-                       Width = _screenWidth * BirdWidthFactor, 
-                       Height = _screenHeight * BirdHeightFactor,
-                       Acceleration = new Vector { X = 0, Y = Gravity},
-                       ScaleFactor = _scale,
-                   };
-            Bird.Position = new Vector
-                            {
-                                X = (_screenWidth + Bird.Width)/2,
-                                Y = (_screenHeight + Bird.Height)/8
-                            };
-            Bird.Collision += (sender, unit) =>
-                              {
-                                  Pause();
-                              };
-            Bird.PositionChanged += (s, e) =>
-                                    {
-                                        BirdModel model = (BirdModel) s;
-                                        model.ViewModel.DisplayPosition = model.DisplayPosition;
-                                    };
-            birdViewModel.Width = Bird.DisplayWidth;
-            birdViewModel.Height = Bird.DisplayHeight;
-            birdViewModel.DisplayPosition = Bird.DisplayPosition;
-
-            UnitViewModel floorViewModel = new UnitViewModel();
-            UnitViewModel ceilingViewModel = new UnitViewModel();
-            SurfaceModel floor = new SurfaceModel(floorViewModel)
-                                     {
-                                         Velocity = Vector.Zero,
-                                         Width = _screenWidth,
-                                         Height = _screenHeight* FloorHeightFactor,
-                                         Position = new Vector {X = 0, Y = _screenHeight*(1 - FloorHeightFactor)},
-                                         ScaleFactor = _scale,
-                                     }; 
-            floor.Collision += (sender, unit) =>
-                               {
-                                   //Only collide with the bird
-                                   if (unit.GetType() != typeof (BirdModel)) return;
-
-                                   Pause();
-                               };
-
-            SurfaceModel ceiling = new SurfaceModel(ceilingViewModel)
-            {
-                Velocity = Vector.Zero,
-                Width = _screenWidth,
-                Height = 10,
-                Position = new Vector { X = 0, Y = -9.6 },
-                ScaleFactor = _scale,
-            };
-            ceiling.Collision += (sender, unit) =>
-            {
-                //Only collide with the bird
-                if (unit.GetType() != typeof(BirdModel)) return;
-
-                Pause();
-            };
-
-            floorViewModel.DisplayPosition = floor.DisplayPosition;
-            floorViewModel.Width = floor.DisplayWidth;
-            floorViewModel.Height = floor.DisplayHeight;
-            ceilingViewModel.DisplayPosition = ceiling.DisplayPosition;
-            ceilingViewModel.Width = ceiling.DisplayWidth;
-            ceilingViewModel.Height = ceiling.DisplayHeight;
-
+          
             //When user hits jump key
             Messenger.Default.Register<KeyDownMessage>(this, KeyDownMessageRecieved);
-
             Messenger.Default.Register<RemoveSurfaceMessage>(this, RemovePipeMessageRecieved);
+            Messenger.Default.Register<AudioVolumnMessage>(this, AudioVolumnMessageRecieved);
 
             UnitCollection = new List<BaseUnitModel>();
             UnitViewModelCollection = new ObservableCollection<UnitViewModel>();
             UnitViewModelCollection.CollectionChanged += (sender, args) =>
                 RaisePropertyChanged("UnitViewModelCollection");
-
-            UnitCollection.Add(Bird);
-            UnitCollection.Add(floor);
-            UnitCollection.Add(ceiling);
-
-            UnitViewModelCollection.Add(birdViewModel);
-            UnitViewModelCollection.Add(floorViewModel);
-            UnitViewModelCollection.Add(ceilingViewModel);
-            CreatePipe();
-
+         
             //Needs to be Windows.Forms.Timer as the other timers are asynchronous
             _worldTimer = new Timer
             {
@@ -227,31 +149,20 @@ namespace ShoutyBird.ViewModels
             };
             _worldTimer.Tick += Tick;
             _worldTimer.Start();
+
+            SetupGame();
+        }
+
+        private void AudioVolumnMessageRecieved(AudioVolumnMessage obj)
+        {
+            Volumn = obj.VolumeSample;
+            Bird.QueueJump(Volumn);
         }
 
         private void KeyDownMessageRecieved(KeyDownMessage obj)
         {
             if (obj.Key == Key.Space)
                 Bird.QueueJump(0.5);
-        }
-
-        private void WaveInOnDataAvailable(object sender, WaveInEventArgs waveInEventArgs)
-        {
-            //int sum = 0;
-            byte[] buffer = waveInEventArgs.Buffer;
-            List<float> list = new List<float>();
-
-            for (int index = 0; index < waveInEventArgs.BytesRecorded; index += 2)
-            {
-                //Converts 2 bytes to a short
-                short sample = (short)((buffer[index + 1] << 8) |
-                                        buffer[index + 0]);
-                float sample32 = sample / (float)short.MaxValue;
-                list.Add(sample32);
-            }
-
-            Volumn = list.Max(s => s);
-            Bird.QueueJump(Volumn);
         }
 
         private void RemovePipeMessageRecieved(RemoveSurfaceMessage message)
@@ -261,6 +172,75 @@ namespace ShoutyBird.ViewModels
             {
                 _unitsToRemove.Enqueue(message.Surface);
             }
+        }
+
+        private void SetupGame()
+        {
+            Score = 0;
+            UnitViewModel birdViewModel = new UnitViewModel();
+            Bird = new BirdModel(birdViewModel, BirdJumpSpeed, MinBirdJumpFactor)
+            {
+                Width = _screenWidth * BirdWidthFactor,
+                Height = _screenHeight * BirdHeightFactor,
+                Acceleration = new Vector { X = 0, Y = Gravity },
+                ScaleFactor = _scale,
+            };
+            Bird.Position = new Vector
+            {
+                X = (_screenWidth + Bird.Width) / 2,
+                Y = (_screenHeight + Bird.Height) / 8
+            };
+            Bird.Collision += BirdCollisionEvent;
+            Bird.PositionChanged += (s, e) =>
+            {
+                BirdModel model = (BirdModel)s;
+                model.ViewModel.DisplayPosition = model.DisplayPosition;
+            };
+            birdViewModel.Width = Bird.DisplayWidth;
+            birdViewModel.Height = Bird.DisplayHeight;
+            birdViewModel.DisplayPosition = Bird.DisplayPosition;
+
+            UnitViewModel floorViewModel = new UnitViewModel();
+            UnitViewModel ceilingViewModel = new UnitViewModel();
+            SurfaceModel floor = new SurfaceModel(floorViewModel)
+            {
+                Velocity = Vector.Zero,
+                Width = _screenWidth,
+                Height = _screenHeight * FloorHeightFactor,
+                Position = new Vector { X = 0, Y = _screenHeight * (1 - FloorHeightFactor) },
+                ScaleFactor = _scale,
+            };
+            floor.Collision += NonBirdCollisionEvent;
+
+            SurfaceModel ceiling = new SurfaceModel(ceilingViewModel)
+            {
+                Velocity = Vector.Zero,
+                Width = _screenWidth,
+                Height = 10,
+                Position = new Vector { X = 0, Y = -9.6 },
+                ScaleFactor = _scale,
+            };
+            ceiling.Collision += NonBirdCollisionEvent;
+
+            floorViewModel.DisplayPosition = floor.DisplayPosition;
+            floorViewModel.Width = floor.DisplayWidth;
+            floorViewModel.Height = floor.DisplayHeight;
+            ceilingViewModel.DisplayPosition = ceiling.DisplayPosition;
+            ceilingViewModel.Width = ceiling.DisplayWidth;
+            ceilingViewModel.Height = ceiling.DisplayHeight;
+
+            //Reset collections
+            UnitCollection.Clear();
+            UnitViewModelCollection.Clear();
+
+            UnitCollection.Add(Bird);
+            UnitCollection.Add(floor);
+            UnitCollection.Add(ceiling);
+
+            UnitViewModelCollection.Add(birdViewModel);
+            UnitViewModelCollection.Add(floorViewModel);
+            UnitViewModelCollection.Add(ceilingViewModel);
+            CreatePipe();
         }
 
         /// <summary>
@@ -290,7 +270,7 @@ namespace ShoutyBird.ViewModels
 
             lock (removeQueueLock)
             {
-                if (_unitsToRemove.Count > 0)
+                while (_unitsToRemove.Count > 0)
                 {
                     var unit = _unitsToRemove.Dequeue();
                     UnitCollection.Remove(unit);
@@ -323,12 +303,7 @@ namespace ShoutyBird.ViewModels
                 ScaleFactor = _scale,
                 Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
             };
-            topPipe.Collision += (s, e) =>
-            {
-                //only collide with bird
-                if (e.GetType() != typeof(BirdModel)) return;
-                Pause();
-            };
+            topPipe.Collision += NonBirdCollisionEvent;
             topPipeViewModel.Height = topPipe.DisplayHeight;
             topPipeViewModel.Width = topPipe.DisplayWidth;
             topPipeViewModel.DisplayPosition = topPipe.DisplayPosition;
@@ -372,11 +347,16 @@ namespace ShoutyBird.ViewModels
                                               PipeModel pipe = (PipeModel) s;
                                               pipe.ViewModel.DisplayPosition = pipe.DisplayPosition;
                                           };
-            bottomPipe.Collision += (s, e) =>
-                                    {
-                                        if (e.GetType() != typeof (BirdModel)) return;
-                                        Pause();
-                                    };
+            bottomPipe.PositionChanged += (sender, args) =>
+            {
+                SurfaceModel p = (SurfaceModel) sender;
+                if (p.Vertices.X2 < -10)
+                {
+                    //Delete the pipe if it goes off screen
+                    Messenger.Default.Send(new RemoveSurfaceMessage(p));
+                }
+            };
+            bottomPipe.Collision += NonBirdCollisionEvent;
 
             UnitCollection.Add(topPipe);
             UnitCollection.Add(bottomPipe);
@@ -384,17 +364,20 @@ namespace ShoutyBird.ViewModels
             UnitViewModelCollection.Add(bottomPipeViewModel);
         }
 
-        private void MoveExecute(KeyEventArgs keyEvent)
-        {
-            if (keyEvent.Key == Key.Space)
-            {
-                Bird.QueueJump(1d);
-            }
-        }
-
         private void Pause()
         {
-            _worldTimer.Stop();
+            //_worldTimer.Stop();
+        }
+
+        private void BirdCollisionEvent(object sender, BaseUnitModel collidingModel)
+        {
+            Pause();
+        }
+
+        private void NonBirdCollisionEvent(object sender, BaseUnitModel collidingModel)
+        {
+            if (collidingModel.GetType() != typeof(BirdModel)) return;
+                Pause();
         }
 
         private double ToGameUnits(double displayUnit, double scale)

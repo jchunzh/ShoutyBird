@@ -10,8 +10,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="640"
         d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
-        DataContext="{Binding Main, Source={StaticResource Locator}}"
-        FocusManager.FocusedElement="{Binding ElementName=Content}">
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewModels:GameViewModel}">
             <shoutyBird:Game></shoutyBird:Game>
@@ -32,6 +31,6 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
-        <ContentPresenter Name="Content" Content="{Binding CurrentViewModel}"></ContentPresenter>
+        <ContentPresenter Content="{Binding CurrentViewModel}"></ContentPresenter>
     </Grid>
 </Window>

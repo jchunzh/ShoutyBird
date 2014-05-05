@@ -94,8 +94,6 @@ namespace ShoutyBird.ViewModels
             }
         }
 
-        public GameStatus Status { get; set; }
-
         private readonly Dictionary<int, UnitViewModel> UnitIdViewModelDictionary = new Dictionary<int, UnitViewModel>();
         private readonly GameWorldModel _world;
 
@@ -103,7 +101,6 @@ namespace ShoutyBird.ViewModels
 
         public GameViewModel()
         {
-            //SetupAudio();
             double screenWidth = 640;
             double screenHeight = 800;
             _scale = 10;
@@ -149,10 +146,10 @@ namespace ShoutyBird.ViewModels
                                                         _backgroundWorker.RunWorkerAsync();
                                                     };
 
-            StartGame();
+            Messenger.Default.Register<StartGameMessage>(this, StartGame);
         }
 
-        private void StartGame()
+        private void StartGame(StartGameMessage obj)
         {
             Debug.WriteLine("Starting background worker");
             _backgroundWorker.RunWorkerAsync();
@@ -214,11 +211,6 @@ namespace ShoutyBird.ViewModels
 
             _time += TimerTick;
             _isBusy = false;
-        }
-
-        private void RestartGame()
-        {
-            StartGame();
         }
 
         private void UnitAdded(BaseUnitModel unit)

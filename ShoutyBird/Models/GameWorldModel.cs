@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
 using System.Timers;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
@@ -79,6 +75,7 @@ namespace ShoutyBird.Models
 
         public GameWorldModel(double screenWidth, double screenHeight)
         {
+            Status = GameStatus.Stopped;
             UnitCollection = new ObservableCollection<BaseUnitModel>();
             UnitCollection.CollectionChanged += UnitCollection_CollectionChanged;
 
@@ -125,6 +122,7 @@ namespace ShoutyBird.Models
 
         private void SetupGame()
         {
+            _distancePassed = 0;
             Score = 0;
             Bird = new BirdModel(UnitType.Bird, BirdJumpSpeed, MinBirdJumpFactor)
             {
@@ -159,16 +157,6 @@ namespace ShoutyBird.Models
                 ScaleFactor = _scale,
             };
             ceiling.Collision += NonBirdCollisionEvent;
-
-            //foreach (BaseUnitModel unit in UnitCollection)
-            //{
-            //    OnUnitRemoved(unit);
-            //}
-
-            //while (isBusy)
-            //{
-            //    Thread.Sleep(10);
-            //}
 
             UnitCollection.Clear();
 
@@ -259,6 +247,7 @@ namespace ShoutyBird.Models
 
             OnUnitCollectionUpdated(UnitCollection);
 
+            //Check for collisions
             foreach (var i in UnitCollection)
             {
                 foreach (var j in UnitCollection)
@@ -287,12 +276,13 @@ namespace ShoutyBird.Models
 
         private void AudioVolumnMessageRecieved(AudioVolumnMessage obj)
         {
-            Bird.QueueJump(obj.VolumeSample);
+            if (Status == GameStatus.Running)
+                Bird.QueueJump(obj.VolumeSample);
         }
 
         private void KeyDownMessageRecieved(KeyDownMessage obj)
         {
-            if (obj.Key == Key.Space)
+            if (Status == GameStatus.Running && obj.Key == Key.Space)
                 Bird.QueueJump(0.5);
         }
 

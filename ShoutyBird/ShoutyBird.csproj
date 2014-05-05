@@ -85,6 +85,7 @@
     <Compile Include="Message\KeyDownMessage.cs" />
     <Compile Include="Message\NavigateBackMessage.cs" />
     <Compile Include="Message\NavigationMessage.cs" />
+    <Compile Include="Message\StartGameMessage.cs" />
     <Compile Include="Models\GameWorldModel.cs" />
     <Compile Include="UnitUserControl.xaml.cs">
       <DependentUpon>UnitUserControl.xaml</DependentUpon>

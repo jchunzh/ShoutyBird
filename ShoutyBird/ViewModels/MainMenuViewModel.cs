@@ -7,8 +7,21 @@ namespace ShoutyBird.ViewModels
 {
     public class MainMenuViewModel : ViewModelBase
     {
+        private bool _isVisible;
         public RelayCommand NavigateToGame { get; set; }
         public RelayCommand NavigateToAudio { get; set; }
+
+        public bool IsVisible
+        {
+            get { return _isVisible; }
+            set
+            {
+                if (_isVisible == value) return;
+                _isVisible = value;
+
+                RaisePropertyChanged("IsVisible");
+            }
+        }
 
         public MainMenuViewModel()
         {
@@ -19,6 +32,7 @@ namespace ShoutyBird.ViewModels
         private void NavigateToGameExecute()
         {
             Messenger.Default.Send(new NavigationMessage(typeof(GameViewModel)));
+            Messenger.Default.Send(new StartGameMessage());
         }
 
         private void NavigateToAudioExecute()

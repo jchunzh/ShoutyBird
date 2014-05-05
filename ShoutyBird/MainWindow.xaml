@@ -31,6 +31,7 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
+        <shoutyBird:Game/>
         <ContentPresenter Content="{Binding CurrentViewModel}"></ContentPresenter>
     </Grid>
 </Window>

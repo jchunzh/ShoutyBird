@@ -1,13 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 using System.Timers;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
 using ShoutyBird.Message;
 using ShoutyBird.ViewModels;
+using Timer = System.Timers.Timer;
 
 namespace ShoutyBird.Models
 {
+    public delegate void UnitCollectionUpdateHandler(IEnumerable<BaseUnitModel> updatedUnits);
+
+    public delegate void UnitAddedHandler(BaseUnitModel addedUnit);
+
+    public delegate void UnitRemovedHandler(BaseUnitModel removedUnit);
+
     public class GameWorldModel
     {
         //Time between ticks in milliseconds
@@ -37,7 +50,7 @@ namespace ShoutyBird.Models
 
         private readonly Random _random;
 
-        private readonly System.Timers.Timer _gameWorldUpdateTimer;
+        private System.Timers.Timer _gameWorldUpdateTimer;
 
         /// <summary>
         /// In ingame units
@@ -49,7 +62,6 @@ namespace ShoutyBird.Models
         private readonly double _screenHeight;
         private readonly double _scale = 10;
 
-
         /// <summary>
         /// Amount of distance in game units the pipes have covered
         /// </summary>
@@ -59,24 +71,56 @@ namespace ShoutyBird.Models
 
         public int Score { get; private set; }
         public BirdModel Bird { get; private set; }
+        public GameStatus Status { get; private set; }
+
+        public event UnitCollectionUpdateHandler UnitCollectionUpdated;
+        public event UnitAddedHandler UnitAdded;
+        public event UnitRemovedHandler UnitRemoved;
 
         public GameWorldModel(double screenWidth, double screenHeight)
         {
             UnitCollection = new ObservableCollection<BaseUnitModel>();
+            UnitCollection.CollectionChanged += UnitCollection_CollectionChanged;
+
             _screenWidth = screenWidth;
             _screenHeight = screenHeight;
             _random = new Random(0);
             Messenger.Default.Register<KeyDownMessage>(this, KeyDownMessageRecieved);
-            Messenger.Default.Register<AudioVolumnMessage>(this, AudioVolumnMessageRecieved);
+            Messenger.Default.Register<AudioVolumnMessage>(this, AudioVolumnMessageRecieved);   
+        }
+
+        void UnitCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (BaseUnitModel unit in e.NewItems)
+                {
+                    OnUnitAdded(unit);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (BaseUnitModel unit in e.NewItems)
+                {
+                    OnUnitRemoved(unit);
+                }
+            }
+        }
+
+        public void Simulate()
+        {
+            Status = GameStatus.Running;
             SetupGame();
             _gameWorldUpdateTimer = new Timer(TimerTick);
             _gameWorldUpdateTimer.Elapsed += Update;
             _gameWorldUpdateTimer.AutoReset = true;
+            _gameWorldUpdateTimer.Start();
         }
 
-        public void Start()
+        public void StopSimulation()
         {
-            _gameWorldUpdateTimer.Start();
+            Status = GameStatus.Stopped;
+            _gameWorldUpdateTimer.Stop();
         }
 
         private void SetupGame()
@@ -115,6 +159,16 @@ namespace ShoutyBird.Models
                 ScaleFactor = _scale,
             };
             ceiling.Collision += NonBirdCollisionEvent;
+
+            //foreach (BaseUnitModel unit in UnitCollection)
+            //{
+            //    OnUnitRemoved(unit);
+            //}
+
+            //while (isBusy)
+            //{
+            //    Thread.Sleep(10);
+            //}
 
             UnitCollection.Clear();
 
@@ -187,21 +241,36 @@ namespace ShoutyBird.Models
 
             UnitCollection.Add(topPipe);
             UnitCollection.Add(bottomPipe);
-            //_unitsToAdd.Enqueue(topPipe);
-            //_unitsToAdd.Enqueue(bottomPipe);
-            //UnitViewModelCollection.Add(topPipeViewModel);
-            //UnitViewModelCollection.Add(bottomPipeViewModel);
-
-            //UnitIdViewModelDictionary.Add(topPipe.Id, topPipeViewModel);
-            //UnitIdViewModelDictionary.Add(bottomPipe.Id, bottomPipeViewModel);
         }
 
+        private bool isBusy = false;
 
         private void Update(object sender, ElapsedEventArgs e)
         {
+            if (isBusy)
+                return;
+
+            isBusy = true;
+
             foreach (var unit in UnitCollection)
             {
                 unit.Update(TimerTick);
+            }
+
+            OnUnitCollectionUpdated(UnitCollection);
+
+            foreach (var i in UnitCollection)
+            {
+                foreach (var j in UnitCollection)
+                {
+                    if (i == j) continue;
+
+                    if (IsCollision(i.Vertices, j.Vertices))
+                    {
+                        i.OnCollision(i, j);
+                        j.OnCollision(j, i);
+                    }
+                }
             }
          
             //allow screen width * PipeSpaceFactor distance pass before making a new pipe
@@ -212,6 +281,8 @@ namespace ShoutyBird.Models
             }
 
             _distancePassed += Math.Abs(PipeSpeedFactor) * _screenWidth * TimerTick / 1000d;
+
+            isBusy = false;
         }
 
         private void AudioVolumnMessageRecieved(AudioVolumnMessage obj)
@@ -239,6 +310,7 @@ namespace ShoutyBird.Models
         private void Pause()
         {
             _gameWorldUpdateTimer.Stop();
+            Status = GameStatus.Stopped;
         }
 
         /// <summary>
@@ -249,6 +321,36 @@ namespace ShoutyBird.Models
         {
             int randNum = _random.Next(50, 1000 - (int)(PipeGapFactor * 1000) - 50);
             return randNum / 1000d;
+        }
+
+        private void OnUnitCollectionUpdated(IEnumerable<BaseUnitModel> updatedUnits)
+        {
+            if (UnitCollectionUpdated != null)
+                UnitCollectionUpdated(updatedUnits);
+        }
+
+        private void OnUnitAdded(BaseUnitModel addedUnit)
+        {
+            if (UnitAdded != null)
+                UnitAdded(addedUnit);
+        }
+
+        private void OnUnitRemoved(BaseUnitModel removedUnit)
+        {
+            if (UnitRemoved != null)
+                UnitRemoved(removedUnit);
+        }
+
+
+        protected bool IsCollision(Vertices a, Vertices b)
+        {
+            if (a.X1 <= b.X2 &&
+                a.X2 >= b.X1 &&
+                a.Y1 <= b.Y2 &&
+                a.Y2 >= b.Y1)
+                return true;
+
+            return false;
         }
     }
 }

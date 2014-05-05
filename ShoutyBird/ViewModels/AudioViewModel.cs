@@ -69,7 +69,8 @@ namespace ShoutyBird.ViewModels
                 list.Add(sample32);
             }
 
-            Messenger.Default.Send(new AudioVolumnMessage(list.Max()));
+            if (list.Count != 0)
+                Messenger.Default.Send(new AudioVolumnMessage(list.Max()));
         }
 
         private void GetAudioDevices()

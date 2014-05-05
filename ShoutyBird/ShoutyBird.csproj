@@ -105,11 +105,11 @@
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\PositionChangedEventArgs.cs" />
     <Compile Include="Message\RemoveSurfaceMessage.cs" />
-    <Compile Include="Message\UnitMovedMessage.cs" />
     <Compile Include="ViewModels\UnitType.cs" />
     <Compile Include="ViewModels\UnitViewModel.cs" />
     <Compile Include="Models\Vertices.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
+    <Compile Include="ViewModels\VolumnViewModel.cs" />
     <Compile Include="VolumeMeterUserControl.xaml.cs">
       <DependentUpon>VolumeMeterUserControl.xaml</DependentUpon>
     </Compile>

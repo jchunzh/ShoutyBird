@@ -45,6 +45,7 @@ namespace ShoutyBird.ViewModels
             SimpleIoc.Default.Register<MainMenuViewModel>();
             SimpleIoc.Default.Register<AudioViewModel>();
             SimpleIoc.Default.Register<GameViewModel>();
+            SimpleIoc.Default.Register<VolumnViewModel>();
         }
 
         public MainViewModel Main
@@ -65,6 +66,11 @@ namespace ShoutyBird.ViewModels
         public GameViewModel Game
         {
             get { return ServiceLocator.Current.GetInstance<GameViewModel>(); }
+        }
+
+        public VolumnViewModel Volumn
+        {
+            get { return ServiceLocator.Current.GetInstance<VolumnViewModel>(); }
         }
         
         public static void Cleanup()

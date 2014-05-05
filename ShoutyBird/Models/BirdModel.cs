@@ -50,16 +50,6 @@ namespace ShoutyBird.Models
             base.Update(timeInterval);
         }
 
-        protected override void UnitUpdateMessageRecieved(UnitUpdateMessage message)
-        {
-            if (message.Unit == this) return;
-
-            if (IsCollision(message.Unit.Vertices, Vertices))
-            {
-                OnCollision(this, message.Unit);
-            }
-        }
-
         public void QueueJump()
         {
             _actionQueue.Enqueue(Action.Jump);

@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -43,10 +46,9 @@ namespace ShoutyBird.ViewModels
         private readonly object _unitCollectionLock = new object();
         private readonly Queue<BaseUnitModel> _unitsToRemove = new Queue<BaseUnitModel>();
         private readonly Queue<BaseUnitModel> _unitsToAdd = new Queue<BaseUnitModel>(); 
+        private readonly Queue<BaseUnitModel> _unitsToUpdate = new Queue<BaseUnitModel>(); 
 
         private ObservableCollection<UnitViewModel> _unitViewModelCollection;
-       
-        private readonly WaveIn _waveIn = new WaveIn();
 
         /// <summary>
         /// In ingame units
@@ -97,6 +99,8 @@ namespace ShoutyBird.ViewModels
         private readonly Dictionary<int, UnitViewModel> UnitIdViewModelDictionary = new Dictionary<int, UnitViewModel>();
         private readonly GameWorldModel _world;
 
+        private readonly BackgroundWorker _backgroundWorker = new BackgroundWorker();
+
         public GameViewModel()
         {
             //SetupAudio();
@@ -105,47 +109,29 @@ namespace ShoutyBird.ViewModels
             _scale = 10;
             _screenWidth = ToGameUnits(screenWidth, _scale);
             _screenHeight = ToGameUnits(screenHeight, _scale);
+
+            UnitViewModelCollection = new ObservableCollection<UnitViewModel>();
+            UnitViewModelCollection.CollectionChanged += (sender, args) =>
+                RaisePropertyChanged("UnitViewModelCollection");
+
             _world = new GameWorldModel(_screenWidth, _screenHeight);
-            _world.UnitCollection.CollectionChanged += (sender, args) =>
-                                                       {
-                                                           if (args.Action == NotifyCollectionChangedAction.Add)
-                                                           {
-                                                               foreach (BaseUnitModel unit in args.NewItems)
-                                                               {
-                                                                   _unitsToAdd.Enqueue(unit);
-                                                               }
-                                                           }
-                                                           else if (args.Action == NotifyCollectionChangedAction.Remove)
-                                                           {
-                                                               foreach (BaseUnitModel unit in args.NewItems)
-                                                               {
-                                                                   _unitsToRemove.Enqueue(unit);
-                                                               }
-                                                           }
-                                                       };
+            _world.UnitAdded += unit => _unitsToAdd.Enqueue(unit);
+            _world.UnitRemoved += unit => _unitsToRemove.Enqueue(unit);
+            _world.UnitCollectionUpdated += unitCollection =>
+                                            {
+                                                foreach (BaseUnitModel unit in unitCollection)
+                                                {
+                                                    _unitsToUpdate.Enqueue(unit);
+                                                }
+                                            };
+
+            foreach (BaseUnitModel unit in _world.UnitCollection)
+            {
+                UnitAdded(unit);
+            }
           
             //When user hits jump key
             Messenger.Default.Register<RemoveSurfaceMessage>(this, RemovePipeMessageRecieved);
-            Messenger.Default.Register<AudioVolumnMessage>(this, AudioVolumnMessageRecieved);
-
-            UnitViewModelCollection = new ObservableCollection<UnitViewModel>();
-
-            foreach (var unit in _world.UnitCollection)
-            {
-                UnitViewModel viewModel = new UnitViewModel(unit.Id)
-                                          {
-                                              DisplayPosition = unit.DisplayPosition,
-                                              Height = unit.DisplayHeight,
-                                              Width = unit.DisplayWidth,
-                                              Type = unit.Type
-                                          };
-                 
-                UnitViewModelCollection.Add(viewModel);
-                UnitIdViewModelDictionary.Add(unit.Id, viewModel);
-            }
-
-            UnitViewModelCollection.CollectionChanged += (sender, args) =>
-                RaisePropertyChanged("UnitViewModelCollection");
 
             //Needs to be Windows.Forms.Timer as the other timers are asynchronous
             _displayUpdateTimer = new Timer
@@ -155,12 +141,31 @@ namespace ShoutyBird.ViewModels
             _displayUpdateTimer.Tick += Tick;
             _displayUpdateTimer.Start();
 
-            _world.Start();
+            _backgroundWorker.DoWork += BackgroundWorkerOnDoWork;
+            _backgroundWorker.RunWorkerCompleted += (sender, args) =>
+                                                    {
+                                                        UnitViewModelCollection.Clear();
+                                                        UnitIdViewModelDictionary.Clear();
+                                                        _backgroundWorker.RunWorkerAsync();
+                                                    };
+
+            StartGame();
         }
 
-        private void AudioVolumnMessageRecieved(AudioVolumnMessage obj)
+        private void StartGame()
         {
-            Volumn = obj.VolumeSample;
+            Debug.WriteLine("Starting background worker");
+            _backgroundWorker.RunWorkerAsync();
+        }
+
+        private void BackgroundWorkerOnDoWork(object sender, DoWorkEventArgs doWorkEventArgs)
+        {
+            _world.Simulate();
+
+            while (_world.Status == GameStatus.Running)
+            {
+                Thread.Sleep(100);
+            }
         }
 
         private void RemovePipeMessageRecieved(RemoveSurfaceMessage message)
@@ -182,18 +187,12 @@ namespace ShoutyBird.ViewModels
             while (_unitsToAdd.Count > 0)
             {
                 BaseUnitModel unit = _unitsToAdd.Dequeue();
-                UnitViewModel newUnitViewModel = new UnitViewModel(unit.Id);
-                newUnitViewModel.Width = unit.Width;
-                newUnitViewModel.Height = unit.Height;
-                newUnitViewModel.DisplayPosition = unit.DisplayPosition;
-                newUnitViewModel.Type = unit.Type;
-                UnitViewModelCollection.Add(newUnitViewModel);
-                UnitIdViewModelDictionary.Add(newUnitViewModel.Id, newUnitViewModel);
+                UnitAdded(unit);
             }
 
-            //TODO not thread safe
-            foreach (var unit in _world.UnitCollection)
+            while (_unitsToUpdate.Count > 0)
             {
+                BaseUnitModel unit = _unitsToUpdate.Dequeue();
                 UnitViewModel unitViewModel;
                 if (!UnitIdViewModelDictionary.TryGetValue(unit.Id, out unitViewModel)) continue;
 
@@ -201,23 +200,37 @@ namespace ShoutyBird.ViewModels
                 unitViewModel.Width = unit.DisplayWidth;
                 unitViewModel.DisplayPosition = unit.DisplayPosition;
             }
-
-            lock (_unitCollectionLock)
+            
+            while (_unitsToRemove.Count > 0)
             {
-                while (_unitsToRemove.Count > 0)
+                var unit = _unitsToRemove.Dequeue();
+                UnitViewModel unitViewModel;
+                if (UnitIdViewModelDictionary.TryGetValue(unit.Id, out unitViewModel))
                 {
-                    var unit = _unitsToRemove.Dequeue();
-                    UnitViewModel unitViewModel;
-                    if (UnitIdViewModelDictionary.TryGetValue(unit.Id, out unitViewModel))
-                    {
-                        UnitViewModelCollection.Remove(unitViewModel);
-                        UnitIdViewModelDictionary.Remove(unit.Id);
-                    }
+                    UnitViewModelCollection.Remove(unitViewModel);
+                    UnitIdViewModelDictionary.Remove(unit.Id);
                 }
             }
 
             _time += TimerTick;
             _isBusy = false;
+        }
+
+        private void RestartGame()
+        {
+            StartGame();
+        }
+
+        private void UnitAdded(BaseUnitModel unit)
+        {
+            UnitViewModel newUnitViewModel = new UnitViewModel(unit.Id);
+            newUnitViewModel.Width = unit.Width;
+            newUnitViewModel.Height = unit.Height;
+            newUnitViewModel.DisplayPosition = unit.DisplayPosition;
+            newUnitViewModel.Type = unit.Type;
+            UnitViewModelCollection.Add(newUnitViewModel);
+            UnitIdViewModelDictionary.Add(newUnitViewModel.Id, newUnitViewModel);
+            
         }
 
         private double ToGameUnits(double displayUnit, double scale)

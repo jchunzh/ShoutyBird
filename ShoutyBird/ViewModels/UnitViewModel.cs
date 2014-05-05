@@ -53,5 +53,12 @@ namespace ShoutyBird.ViewModels
                 RaisePropertyChanged("Height");
             }
         }
+
+        public int Id { get; private set; }
+
+        public UnitViewModel(int id)
+        {
+            Id = id;
+        }
     }
 }

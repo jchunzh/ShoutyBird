@@ -5,7 +5,7 @@ namespace ShoutyBird.Models
 {
     public class SurfaceModel : BaseUnitModel
     {
-        public SurfaceModel(UnitViewModel viewModel) : base(viewModel)
+        public SurfaceModel(UnitType type) : base(type)
         {
             
         }

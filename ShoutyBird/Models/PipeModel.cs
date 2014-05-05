@@ -4,7 +4,7 @@ namespace ShoutyBird.Models
 {
     public class PipeModel : SurfaceModel
     {
-        public PipeModel(UnitViewModel viewModel) : base(viewModel)
+        public PipeModel(UnitType type) : base(type)
         {
         }
     }

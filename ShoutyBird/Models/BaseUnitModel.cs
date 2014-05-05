@@ -10,6 +10,7 @@ namespace ShoutyBird.Models
 
     public abstract class BaseUnitModel : IDisposable
     {
+        private static int _idCounter;
         private Vector _position;
         public event CollisionEventHandler Collision;
         public event PositionChangedEventHandler PositionChanged;
@@ -55,6 +56,8 @@ namespace ShoutyBird.Models
 
         public double Height { get; set; }
 
+        public int Id { get; private set; }
+
         public Vector ToDisplayUnits(Vector gameUnit)
         {
             return new Vector { X = gameUnit.X * ScaleFactor, Y = gameUnit.Y * ScaleFactor };
@@ -65,11 +68,16 @@ namespace ShoutyBird.Models
             return gameUnit * ScaleFactor;
         }
 
-        public UnitViewModel ViewModel { get; private set; }
+        public UnitType Type { get; private set; }
 
-        protected BaseUnitModel(UnitViewModel viewModel)
+        //public UnitViewModel ViewModel { get; private set; }
+
+        protected BaseUnitModel(UnitType unitType)
         {
-            ViewModel = viewModel;
+            Type = unitType;
+            Id = _idCounter;
+            _idCounter++;
+            //ViewModel = viewModel;
             Updated += (sender, args) => Messenger.Default.Send(new UnitUpdateMessage(this));
             Messenger.Default.Register<UnitUpdateMessage>(this, UnitUpdateMessageRecieved);
         }

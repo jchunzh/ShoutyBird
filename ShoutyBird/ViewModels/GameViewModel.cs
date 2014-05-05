@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Forms;
+using System.Timers;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 using NAudio.Wave;
 using ShoutyBird.Message;
 using ShoutyBird.Models;
+using Timer = System.Windows.Forms.Timer;
 
 namespace ShoutyBird.ViewModels
 {
@@ -36,11 +37,19 @@ namespace ShoutyBird.ViewModels
         /// </summary>
         private double _time;
         private bool _isBusy;
-        private readonly Timer _worldTimer;
+        /// <summary>
+        /// Timer for when the viewmodels are updated
+        /// </summary>
+        private readonly Timer _displayUpdateTimer;
+        /// <summary>
+        /// Timer for the game world simulation
+        /// </summary>
+        private readonly System.Timers.Timer _gameWorldUpdateTimer;
         private BirdModel _bird;
 
         private readonly object _unitCollectionLock = new object();
         private readonly Queue<BaseUnitModel> _unitsToRemove = new Queue<BaseUnitModel>();
+        private readonly Queue<BaseUnitModel> _unitsToAdd = new Queue<BaseUnitModel>(); 
 
         private ObservableCollection<UnitViewModel> _unitViewModelCollection;
         private readonly Random _random;
@@ -123,6 +132,8 @@ namespace ShoutyBird.ViewModels
 
         public GameStatus Status { get; set; }
 
+        private readonly Dictionary<int, UnitViewModel> UnitIdViewModelDictionary = new Dictionary<int, UnitViewModel>();
+
         public GameViewModel()
         {
             //SetupAudio();
@@ -144,11 +155,16 @@ namespace ShoutyBird.ViewModels
                 RaisePropertyChanged("UnitViewModelCollection");
 
             //Needs to be Windows.Forms.Timer as the other timers are asynchronous
-            _worldTimer = new Timer
+            _displayUpdateTimer = new Timer
             {
                 Interval = TimerTick,
             };
-            _worldTimer.Tick += Tick;
+            _displayUpdateTimer.Tick += Tick;
+
+            //Have simulation update on an asynchronous timer while the display updates on the main thread using a synchronous timer
+            _gameWorldUpdateTimer = new System.Timers.Timer(TimerTick);
+            _gameWorldUpdateTimer.Elapsed += Update;
+            _gameWorldUpdateTimer.AutoReset = true;
 
             SetupGame();
         }
@@ -177,12 +193,10 @@ namespace ShoutyBird.ViewModels
         private void SetupGame()
         {
             Status = GameStatus.Restarting;
-            _worldTimer.Stop();
+            _displayUpdateTimer.Stop();
             _unitsToRemove.Clear();
             Score = 0;
-            UnitViewModel birdViewModel = new UnitViewModel();
-            birdViewModel.Type = UnitType.Bird;
-            Bird = new BirdModel(birdViewModel, BirdJumpSpeed, MinBirdJumpFactor)
+            Bird = new BirdModel(UnitType.Bird, BirdJumpSpeed, MinBirdJumpFactor)
             {
                 Width = _screenWidth * BirdWidthFactor,
                 Height = _screenHeight * BirdHeightFactor,
@@ -198,43 +212,52 @@ namespace ShoutyBird.ViewModels
             Bird.PositionChanged += (s, e) =>
             {
                 BirdModel model = (BirdModel)s;
-                model.ViewModel.DisplayPosition = model.DisplayPosition;
             };
-            birdViewModel.Width = Bird.DisplayWidth;
-            birdViewModel.Height = Bird.DisplayHeight;
-            birdViewModel.DisplayPosition = Bird.DisplayPosition;
 
-            UnitViewModel floorViewModel = new UnitViewModel();
-            UnitViewModel ceilingViewModel = new UnitViewModel();
-            SurfaceModel floor = new SurfaceModel(floorViewModel)
-            {
-                Velocity = Vector.Zero,
-                Width = _screenWidth,
-                Height = _screenHeight * FloorHeightFactor,
-                Position = new Vector { X = 0, Y = _screenHeight * (1 - FloorHeightFactor) },
-                ScaleFactor = _scale,
-            };
+            UnitViewModel birdViewModel = new UnitViewModel(Bird.Id)
+                                          {
+                                              Type = UnitType.Bird,
+                                              Width = Bird.DisplayWidth,
+                                              Height = Bird.DisplayHeight,
+                                              DisplayPosition = Bird.DisplayPosition
+                                          };
+
+            SurfaceModel floor = new SurfaceModel(UnitType.Floor)
+                                {
+                                    Velocity = Vector.Zero,
+                                    Width = _screenWidth,
+                                    Height = _screenHeight * FloorHeightFactor,
+                                    Position = new Vector { X = 0, Y = _screenHeight * (1 - FloorHeightFactor) },
+                                    ScaleFactor = _scale,
+                                };
             floor.Collision += NonBirdCollisionEvent;
 
-            SurfaceModel ceiling = new SurfaceModel(ceilingViewModel)
-            {
-                Velocity = Vector.Zero,
-                Width = _screenWidth,
-                Height = 10,
-                Position = new Vector { X = 0, Y = -9.6 },
-                ScaleFactor = _scale,
-            };
+            SurfaceModel ceiling = new SurfaceModel(UnitType.Ceiling)
+                                   {
+                                        Velocity = Vector.Zero,
+                                        Width = _screenWidth,
+                                        Height = 10,
+                                        Position = new Vector { X = 0, Y = -9.6 },
+                                        ScaleFactor = _scale,
+                                    };
             ceiling.Collision += NonBirdCollisionEvent;
 
-            floorViewModel.DisplayPosition = floor.DisplayPosition;
-            floorViewModel.Width = floor.DisplayWidth;
-            floorViewModel.Height = floor.DisplayHeight;
-            ceilingViewModel.DisplayPosition = ceiling.DisplayPosition;
-            ceilingViewModel.Width = ceiling.DisplayWidth;
-            ceilingViewModel.Height = ceiling.DisplayHeight;
 
-            floorViewModel.Type = UnitType.Floor;
-            ceilingViewModel.Type = UnitType.Ceiling;
+            UnitViewModel floorViewModel = new UnitViewModel(floor.Id)
+                                           {
+                                               Type = UnitType.Floor,
+                                               DisplayPosition = floor.DisplayPosition,
+                                               Width = floor.DisplayWidth,
+                                               Height = floor.DisplayHeight
+                                           };
+
+            UnitViewModel ceilingViewModel = new UnitViewModel(ceiling.Id)
+                                             {
+                                                 DisplayPosition = ceiling.DisplayPosition,
+                                                 Width = ceiling.DisplayWidth,
+                                                 Height = ceiling.DisplayHeight,
+                                                 Type = UnitType.Ceiling
+                                             };
 
             //Reset collections
             lock (_unitCollectionLock)
@@ -249,11 +272,16 @@ namespace ShoutyBird.ViewModels
                 UnitViewModelCollection.Add(birdViewModel);
                 UnitViewModelCollection.Add(floorViewModel);
                 UnitViewModelCollection.Add(ceilingViewModel);
+
+                UnitIdViewModelDictionary.Add(Bird.Id, birdViewModel);
+                UnitIdViewModelDictionary.Add(floor.Id, floorViewModel);
+                UnitIdViewModelDictionary.Add(ceiling.Id, ceilingViewModel);
                 CreatePipe();
             }
 
             Status = GameStatus.Running;
-            _worldTimer.Start();
+            _displayUpdateTimer.Start();
+            _gameWorldUpdateTimer.Enabled = true;
         }
 
         /// <summary>
@@ -263,15 +291,8 @@ namespace ShoutyBird.ViewModels
         private int _score;
         private float _volumn;
 
-        private void Tick(object state, EventArgs e)
+        private void Update(object sender, ElapsedEventArgs e)
         {
-            if (Status == GameStatus.Restarting)
-                return;
-
-            if (_isBusy) return;
-
-            _isBusy = true;
-
             lock (_unitCollectionLock)
             {
                 foreach (var unit in UnitCollection)
@@ -281,12 +302,43 @@ namespace ShoutyBird.ViewModels
             }
 
             //allow screen width * PipeSpaceFactor distance pass before making a new pipe
-            if (_distancePassed >= PipeSpaceFactor*_screenWidth)
+            if (_distancePassed >= PipeSpaceFactor * _screenWidth)
             {
                 _distancePassed = 0;
                 lock (_unitCollectionLock)
                 {
                     CreatePipe();
+                }
+            }
+        }
+
+        private void Tick(object state, EventArgs e)
+        {
+            lock (_unitCollectionLock)
+            {
+                while (_unitsToAdd.Count > 0)
+                {
+                    BaseUnitModel unit = _unitsToAdd.Dequeue();
+                    UnitViewModel newUnitViewModel = new UnitViewModel(unit.Id);
+                    newUnitViewModel.Width = unit.Width;
+                    newUnitViewModel.Height = unit.Height;
+                    newUnitViewModel.DisplayPosition = unit.DisplayPosition;
+                    newUnitViewModel.Type = unit.Type;
+                    UnitViewModelCollection.Add(newUnitViewModel);
+                    UnitIdViewModelDictionary.Add(newUnitViewModel.Id, newUnitViewModel);
+                }
+            }
+
+            lock (_unitCollectionLock)
+            {
+                foreach (var unit in UnitCollection)
+                {
+                    UnitViewModel unitViewModel;
+                    if (!UnitIdViewModelDictionary.TryGetValue(unit.Id, out unitViewModel)) continue;
+
+                    unitViewModel.Height = unit.DisplayHeight;
+                    unitViewModel.Width = unit.DisplayWidth;
+                    unitViewModel.DisplayPosition = unit.DisplayPosition;
                 }
             }
 
@@ -296,7 +348,12 @@ namespace ShoutyBird.ViewModels
                 {
                     var unit = _unitsToRemove.Dequeue();
                     UnitCollection.Remove(unit);
-                    UnitViewModelCollection.Remove(unit.ViewModel);
+                    UnitViewModel unitViewModel;
+                    if (UnitIdViewModelDictionary.TryGetValue(unit.Id, out unitViewModel))
+                    {
+                        UnitViewModelCollection.Remove(unitViewModel);
+                        UnitIdViewModelDictionary.Remove(unit.Id);
+                    }
                 }
             }
 
@@ -314,10 +371,7 @@ namespace ShoutyBird.ViewModels
             double bottomPipeHeight = pipeScreenHeight*(1 - pipeHeightFactor - PipeGapFactor);
             double bottomPipeYPos = (PipeGapFactor + pipeHeightFactor)*pipeScreenHeight;
 
-            UnitViewModel topPipeViewModel = new UnitViewModel();
-            UnitViewModel bottomPipeViewModel = new UnitViewModel();
-
-            PipeModel topPipe = new PipeModel(topPipeViewModel)
+            PipeModel topPipe = new PipeModel(UnitType.Pipe)
             {
                 Position = new Vector { X = _screenWidth + 1, Y = 0 },
                 Width = _screenWidth * PipeWidthFactor,
@@ -326,15 +380,11 @@ namespace ShoutyBird.ViewModels
                 Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
             };
             topPipe.Collision += NonBirdCollisionEvent;
-            topPipeViewModel.Height = topPipe.DisplayHeight;
-            topPipeViewModel.Width = topPipe.DisplayWidth;
-            topPipeViewModel.DisplayPosition = topPipe.DisplayPosition;
 
             //Score
             topPipe.PositionChanged += (sender, args) =>
                                        {
                                            var pipe = (SurfaceModel) sender;
-                                           pipe.ViewModel.DisplayPosition = pipe.DisplayPosition;
 
                                            if (args.PreviousPosition.X + (pipe.Width / 2) > Bird.Position.X + (Bird.Width/2) &&
                                                args.NewPosition.X + (pipe.Width / 2) <= Bird.Position.X + (Bird.Width/2))
@@ -353,7 +403,7 @@ namespace ShoutyBird.ViewModels
                                           }
                                       };
 
-            PipeModel bottomPipe = new PipeModel(bottomPipeViewModel)
+            PipeModel bottomPipe = new PipeModel(UnitType.Pipe)
                                           {
                                               Position = new Vector { X = _screenWidth + 1, Y = bottomPipeYPos },
                                               Width = _screenWidth * PipeWidthFactor,
@@ -361,14 +411,7 @@ namespace ShoutyBird.ViewModels
                                               ScaleFactor = _scale,
                                               Velocity = new Vector { X = PipeSpeedFactor * _screenWidth, Y = 0 }
                                           };
-            bottomPipeViewModel.Width = bottomPipe.DisplayWidth;
-            bottomPipeViewModel.Height = bottomPipe.DisplayHeight;
-            bottomPipeViewModel.DisplayPosition = bottomPipe.DisplayPosition;
-            bottomPipe.PositionChanged += (s, e) =>
-                                          {
-                                              PipeModel pipe = (PipeModel) s;
-                                              pipe.ViewModel.DisplayPosition = pipe.DisplayPosition;
-                                          };
+           
             bottomPipe.PositionChanged += (sender, args) =>
             {
                 SurfaceModel p = (SurfaceModel) sender;
@@ -380,18 +423,37 @@ namespace ShoutyBird.ViewModels
             };
             bottomPipe.Collision += NonBirdCollisionEvent;
 
-            topPipeViewModel.Type = UnitType.Pipe;
-            bottomPipeViewModel.Type = UnitType.Pipe;
+            UnitViewModel topPipeViewModel = new UnitViewModel(topPipe.Id)
+                                             {
+                                                 Height = topPipe.DisplayHeight,
+                                                 Width = topPipe.DisplayWidth,
+                                                 DisplayPosition = topPipe.DisplayPosition,
+                                                 Type = UnitType.Pipe
+                                             };
+
+            UnitViewModel bottomPipeViewModel = new UnitViewModel(bottomPipe.Id)
+                                                {
+                                                    Width = bottomPipe.DisplayWidth,
+                                                    Height = bottomPipe.DisplayHeight,
+                                                    DisplayPosition =
+                                                        bottomPipe.DisplayPosition,
+                                                    Type = UnitType.Pipe
+                                                };
 
             UnitCollection.Add(topPipe);
             UnitCollection.Add(bottomPipe);
-            UnitViewModelCollection.Add(topPipeViewModel);
-            UnitViewModelCollection.Add(bottomPipeViewModel);
+            _unitsToAdd.Enqueue(topPipe);
+            _unitsToAdd.Enqueue(bottomPipe);
+            //UnitViewModelCollection.Add(topPipeViewModel);
+            //UnitViewModelCollection.Add(bottomPipeViewModel);
+
+            //UnitIdViewModelDictionary.Add(topPipe.Id, topPipeViewModel);
+            //UnitIdViewModelDictionary.Add(bottomPipe.Id, bottomPipeViewModel);
         }
 
         private void Pause()
         {
-            SetupGame();
+            //SetupGame();
             //_worldTimer.Stop();
         }
 

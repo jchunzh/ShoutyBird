@@ -15,7 +15,7 @@ namespace ShoutyBird.Models
         private readonly double JumpSpeed;
         private readonly double MinJumpFactor;
 
-        public BirdModel(UnitViewModel viewModel, double maxJumpSpeed, double minJumpFactor) : base(viewModel)
+        public BirdModel(UnitType type, double maxJumpSpeed, double minJumpFactor) : base(type)
         {
             JumpSpeed = maxJumpSpeed;
             MinJumpFactor = minJumpFactor;

@@ -81,7 +81,7 @@
       <DependentUpon>MainMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="Message\AudioVolumnMessage.cs" />
-    <Compile Include="Message\GameStatusMessage.cs" />
+    <Compile Include="Message\SetGameStatusMessage.cs" />
     <Compile Include="Message\KeyDownMessage.cs" />
     <Compile Include="Message\NavigateBackMessage.cs" />
     <Compile Include="Message\NavigationMessage.cs" />

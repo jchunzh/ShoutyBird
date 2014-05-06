@@ -1,16 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading;
-using System.Timers;
-using System.Windows.Forms;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
-using NAudio.Wave;
 using ShoutyBird.Message;
 using ShoutyBird.Models;
 using Timer = System.Windows.Forms.Timer;
@@ -139,19 +134,46 @@ namespace ShoutyBird.ViewModels
             _displayUpdateTimer.Start();
 
             _backgroundWorker.DoWork += BackgroundWorkerOnDoWork;
-            _backgroundWorker.RunWorkerCompleted += (sender, args) =>
-                                                    {
-                                                        UnitViewModelCollection.Clear();
-                                                        UnitIdViewModelDictionary.Clear();
-                                                        _backgroundWorker.RunWorkerAsync();
-                                                    };
+            _backgroundWorker.RunWorkerCompleted += StopGame;
 
             Messenger.Default.Register<StartGameMessage>(this, StartGame);
+            Messenger.Default.Register<SetGameStatusMessage>(this, SetGameStatus);
+            Messenger.Default.Register<KeyDownMessage>(this, KeyDownMessageRecieved);
+        }
+
+        private void KeyDownMessageRecieved(KeyDownMessage obj)
+        {
+            if (obj.Key == Key.Escape)
+            {
+                if (_world.Status == GameStatus.Running)
+                    Pause();
+                else if (_world.Status == GameStatus.Paused)
+                    Resume();
+            }
+        }
+
+        private void SetGameStatus(SetGameStatusMessage obj)
+        {
+            switch (obj.FutureStatus)
+            {
+                case GameStatus.Paused:
+                    Pause();
+                    break;
+                case GameStatus.Running:
+                    Resume();
+                    break;
+            }
+        }
+
+        private void StopGame(object sender, RunWorkerCompletedEventArgs e)
+        {
+            StartGame(null);
         }
 
         private void StartGame(StartGameMessage obj)
         {
-            Debug.WriteLine("Starting background worker");
+            UnitViewModelCollection.Clear();
+            UnitIdViewModelDictionary.Clear();
             _backgroundWorker.RunWorkerAsync();
         }
 
@@ -159,7 +181,7 @@ namespace ShoutyBird.ViewModels
         {
             _world.Simulate();
 
-            while (_world.Status == GameStatus.Running)
+            while (_world.Status == GameStatus.Running || _world.Status == GameStatus.Paused)
             {
                 Thread.Sleep(100);
             }
@@ -191,7 +213,7 @@ namespace ShoutyBird.ViewModels
             {
                 BaseUnitModel unit = _unitsToUpdate.Dequeue();
                 UnitViewModel unitViewModel;
-                if (!UnitIdViewModelDictionary.TryGetValue(unit.Id, out unitViewModel)) continue;
+                if (unit == null || !UnitIdViewModelDictionary.TryGetValue(unit.Id, out unitViewModel)) continue;
 
                 unitViewModel.Height = unit.DisplayHeight;
                 unitViewModel.Width = unit.DisplayWidth;
@@ -230,5 +252,14 @@ namespace ShoutyBird.ViewModels
             return displayUnit / scale;
         }
 
+        private void Pause()
+        {
+            _world.PauseSimulation();
+        }
+
+        private void Resume()
+        {
+            _world.ResumeSimulation();
+        }
     }
 }

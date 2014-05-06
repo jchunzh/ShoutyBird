@@ -4,6 +4,7 @@
     {
         Running,
         Stopped,
+        Paused,
         Restarting
     }
 }

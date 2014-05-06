@@ -120,6 +120,18 @@ namespace ShoutyBird.Models
             _gameWorldUpdateTimer.Stop();
         }
 
+        public void PauseSimulation()
+        {
+            Status = GameStatus.Paused;
+            _gameWorldUpdateTimer.Stop();
+        }
+
+        public void ResumeSimulation()
+        {
+            Status = GameStatus.Running;
+            _gameWorldUpdateTimer.Start();
+        }
+
         private void SetupGame()
         {
             _distancePassed = 0;
@@ -288,16 +300,16 @@ namespace ShoutyBird.Models
 
         private void BirdCollisionEvent(object sender, BaseUnitModel collidingModel)
         {
-            Pause();
+            Stop();
         }
 
         private void NonBirdCollisionEvent(object sender, BaseUnitModel collidingModel)
         {
             if (collidingModel.GetType() != typeof(BirdModel)) return;
-            Pause();
+            Stop();
         }
 
-        private void Pause()
+        private void Stop()
         {
             _gameWorldUpdateTimer.Stop();
             Status = GameStatus.Stopped;

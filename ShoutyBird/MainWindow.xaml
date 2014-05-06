@@ -23,9 +23,6 @@
             <views:MainMenu/>
         </DataTemplate>
     </Window.Resources>
-    <!--<shoutyBird:Game x:Name="Game"/>-->
-    <!--<Frame Name="MainFrame" Source="MainMenu.xaml"/>-->
-    <!--<shoutyBird:MainMenu/>-->
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="KeyDown">
             <command:EventToCommand Command="{Binding KeyDown}" PassEventArgsToCommand="True"/>

@@ -5,8 +5,6 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:converters="clr-namespace:ShoutyBird.Converters"
       xmlns:shoutyBird="clr-namespace:ShoutyBird"
-      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-      xmlns:command="http://www.galasoft.ch/mvvmlight"
       xmlns:viewModels="clr-namespace:ShoutyBird.ViewModels"
       xmlns:views="clr-namespace:ShoutyBird.Views"
       mc:Ignorable="d" 
@@ -37,6 +35,6 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Canvas>
-        <views:InGameMenu DataContext="{Binding Menu}" Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <views:InGameMenu DataContext="{Binding Menu}" Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
 </UserControl>

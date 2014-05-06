@@ -44,7 +44,7 @@ namespace ShoutyBird.ViewModels
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<MainMenuViewModel>();
             SimpleIoc.Default.Register<AudioViewModel>();
-            SimpleIoc.Default.Register<GameViewModel>();
+            SimpleIoc.Default.Register<GameViewModel>(true);
             SimpleIoc.Default.Register<VolumnViewModel>();
         }
 

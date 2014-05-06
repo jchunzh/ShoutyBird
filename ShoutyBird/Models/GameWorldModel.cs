@@ -5,9 +5,7 @@ using System.Collections.Specialized;
 using System.Timers;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
-using ShoutyBird.Message;
 using ShoutyBird.Messages;
-using ShoutyBird.ViewModels;
 using Timer = System.Timers.Timer;
 
 namespace ShoutyBird.Models
@@ -119,6 +117,7 @@ namespace ShoutyBird.Models
         {
             Status = GameStatus.Stopped;
             _gameWorldUpdateTimer.Stop();
+            SetupGame();
         }
 
         public void PauseSimulation()
@@ -133,7 +132,7 @@ namespace ShoutyBird.Models
             _gameWorldUpdateTimer.Start();
         }
 
-        private void SetupGame()
+        public void SetupGame()
         {
             _distancePassed = 0;
             Score = 0;

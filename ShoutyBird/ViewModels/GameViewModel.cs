@@ -153,11 +153,13 @@ namespace ShoutyBird.ViewModels
 
             _backgroundWorker.DoWork += BackgroundWorkerOnDoWork;
             _backgroundWorker.RunWorkerCompleted += StopGame;
+            _backgroundWorker.WorkerSupportsCancellation = true;
 
             Messenger.Default.Register<StartGameMessage>(this, StartGame);
             Messenger.Default.Register<SetGameStatusMessage>(this, SetGameStatus);
             Messenger.Default.Register<KeyDownMessage>(this, KeyDownMessageRecieved);
             Menu = new InGameMenuViewModel();
+            _world.SetupGame();
         }
 
         private void KeyDownMessageRecieved(KeyDownMessage obj)
@@ -181,7 +183,17 @@ namespace ShoutyBird.ViewModels
                 case GameStatus.Running:
                     Resume();
                     break;
+                case GameStatus.Stopped:
+                    Exit();
+                    break;
             }
+        }
+
+        private void Exit()
+        {
+            _world.StopSimulation();
+            UnitViewModelCollection.Clear();
+            UnitIdViewModelDictionary.Clear();
         }
 
         private void StopGame(object sender, RunWorkerCompletedEventArgs e)
@@ -193,6 +205,10 @@ namespace ShoutyBird.ViewModels
         {
             UnitViewModelCollection.Clear();
             UnitIdViewModelDictionary.Clear();
+
+            if (_backgroundWorker.IsBusy)
+                throw new NotImplementedException("About to start background worker while it is still running");
+
             _backgroundWorker.RunWorkerAsync();
         }
 
@@ -202,7 +218,7 @@ namespace ShoutyBird.ViewModels
 
             while (_world.Status == GameStatus.Running || _world.Status == GameStatus.Paused)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(10);
             }
         }
 
@@ -254,8 +270,8 @@ namespace ShoutyBird.ViewModels
         private void UnitAdded(BaseUnitModel unit)
         {
             UnitViewModel newUnitViewModel = new UnitViewModel(unit.Id);
-            newUnitViewModel.Width = unit.Width;
-            newUnitViewModel.Height = unit.Height;
+            newUnitViewModel.Width = unit.DisplayWidth;
+            newUnitViewModel.Height = unit.DisplayHeight;
             newUnitViewModel.DisplayPosition = unit.DisplayPosition;
             newUnitViewModel.Type = unit.Type;
             UnitViewModelCollection.Add(newUnitViewModel);

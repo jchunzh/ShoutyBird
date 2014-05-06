@@ -48,6 +48,7 @@ namespace ShoutyBird.ViewModels
         {
             Messenger.Default.Send(new SetGameStatusMessage(GameStatus.Stopped));
             Messenger.Default.Send(new NavigationMessage(typeof(MainMenuViewModel)));
+            IsVisible = false;
         }
     }
 }

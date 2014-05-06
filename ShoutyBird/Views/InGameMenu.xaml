@@ -8,8 +8,13 @@
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance viewModels:InGameMenuViewModel}"
              DataContext="{Binding}">
-    <StackPanel Background="Transparent" Orientation="Vertical">
-        <Button Content="Resume" Command="{Binding ResumeGame}"/>
-        <Button Content="Quit" Command="{Binding ExitGame}"/>
-    </StackPanel>
+    <Grid HorizontalAlignment="Center" Background="Transparent">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Vertical">
+            <Button Content="Resume" Command="{Binding ResumeGame}" Padding="20 5"/>
+            <Button Content="Quit" Command="{Binding ExitGame}" Padding="20 5"/>
+        </StackPanel>
+    </Grid>
 </UserControl>

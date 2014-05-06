@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using ShoutyBird.Models;
 
 namespace ShoutyBird.ViewModels
 {

@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace ShoutyBird
+namespace ShoutyBird.Views
 {
     /// <summary>
     /// Interaction logic for UserControl1.xaml

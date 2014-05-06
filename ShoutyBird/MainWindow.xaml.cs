@@ -1,7 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Navigation;
-using GalaSoft.MvvmLight.Messaging;
-using ShoutyBird.Message;
 
 namespace ShoutyBird
 {

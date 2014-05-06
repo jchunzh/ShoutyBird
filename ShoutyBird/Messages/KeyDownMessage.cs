@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
 
-namespace ShoutyBird.Message
+namespace ShoutyBird.Messages
 {
     public class KeyDownMessage : MessageBase
     {

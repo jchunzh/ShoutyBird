@@ -7,6 +7,7 @@
         xmlns:viewModels="clr-namespace:ShoutyBird.ViewModels"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
+        xmlns:views="clr-namespace:ShoutyBird.Views"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="640"
         d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
@@ -16,10 +17,10 @@
             <shoutyBird:Game></shoutyBird:Game>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:AudioViewModel}">
-            <shoutyBird:AudioMenu></shoutyBird:AudioMenu>
+            <views:AudioMenu></views:AudioMenu>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:MainMenuViewModel}">
-            <shoutyBird:MainMenu/>
+            <views:MainMenu/>
         </DataTemplate>
     </Window.Resources>
     <!--<shoutyBird:Game x:Name="Game"/>-->

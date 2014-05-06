@@ -8,6 +8,7 @@
       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
       xmlns:command="http://www.galasoft.ch/mvvmlight"
       xmlns:viewModels="clr-namespace:ShoutyBird.ViewModels"
+      xmlns:views="clr-namespace:ShoutyBird.Views"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300"
       d:DataContext="{d:DesignInstance viewModels:GameViewModel}"
@@ -16,22 +17,25 @@
     <UserControl.Resources>
         <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
     </UserControl.Resources>
-    <Canvas x:Name="BackgroundCanvas" Background="LightSkyBlue">
-        <shoutyBird:VolumeMeterUserControl MeterHeightFactor="{Binding Volumn}" Width="50" Height="100" Canvas.ZIndex="99"/>
-        <shoutyBird:ScoreUserControl Score="{Binding Score}" Canvas.ZIndex="99" Canvas.Top="75" Canvas.Left="315"/>
-        <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitViewModelCollection}" Canvas.ZIndex="98">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas IsItemsHost="True"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Width="{Binding Width}" Height="{Binding Height}" Margin="{Binding DisplayPosition, Converter={StaticResource PositionToMarginConverter}}">
-                        <shoutyBird:UnitUserControl DataContext="{Binding}"/>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </Canvas>
+    <Grid>
+        <Canvas x:Name="BackgroundCanvas" Background="LightSkyBlue">
+            <shoutyBird:VolumeMeterUserControl MeterHeightFactor="{Binding Volumn}" Width="50" Height="100" Canvas.ZIndex="99"/>
+            <views:ScoreUserControl Score="{Binding Score}" Canvas.ZIndex="99" Canvas.Top="75" Canvas.Left="315"/>
+            <ItemsControl  Name="Display" Focusable="True" IsEnabled="True" ItemsSource="{Binding UnitViewModelCollection}" Canvas.ZIndex="98">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="{Binding Width}" Height="{Binding Height}" Margin="{Binding DisplayPosition, Converter={StaticResource PositionToMarginConverter}}">
+                            <views:UnitUserControl DataContext="{Binding}"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Canvas>
+        
+    </Grid>
 </UserControl>

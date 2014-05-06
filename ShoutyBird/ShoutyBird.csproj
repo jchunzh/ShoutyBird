@@ -70,43 +70,46 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AudioMenu.xaml.cs">
+    <Compile Include="Views\AudioMenu.xaml.cs">
       <DependentUpon>AudioMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\PositionToMarginConverter.cs" />
     <Compile Include="Game.xaml.cs">
       <DependentUpon>Game.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainMenu.xaml.cs">
+    <Compile Include="Views\InGameMenu.xaml.cs">
+      <DependentUpon>InGameMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainMenu.xaml.cs">
       <DependentUpon>MainMenu.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Message\AudioVolumnMessage.cs" />
-    <Compile Include="Message\SetGameStatusMessage.cs" />
-    <Compile Include="Message\KeyDownMessage.cs" />
-    <Compile Include="Message\NavigateBackMessage.cs" />
-    <Compile Include="Message\NavigationMessage.cs" />
-    <Compile Include="Message\StartGameMessage.cs" />
+    <Compile Include="Messages\AudioVolumnMessage.cs" />
+    <Compile Include="Messages\SetGameStatusMessage.cs" />
+    <Compile Include="Messages\KeyDownMessage.cs" />
+    <Compile Include="Messages\NavigateBackMessage.cs" />
+    <Compile Include="Messages\NavigationMessage.cs" />
+    <Compile Include="Messages\StartGameMessage.cs" />
     <Compile Include="Models\GameWorldModel.cs" />
-    <Compile Include="UnitUserControl.xaml.cs">
+    <Compile Include="Views\UnitUserControl.xaml.cs">
       <DependentUpon>UnitUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ScoreUserControl.xaml.cs">
+    <Compile Include="Views\ScoreUserControl.xaml.cs">
       <DependentUpon>ScoreUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Vector.cs" />
-    <Compile Include="ViewModels\Action.cs" />
+    <Compile Include="Models\Action.cs" />
     <Compile Include="Models\BaseUnitModel.cs" />
     <Compile Include="Models\BirdModel.cs" />
     <Compile Include="ViewModels\AudioViewModel.cs" />
-    <Compile Include="ViewModels\GameStatus.cs" />
+    <Compile Include="Models\GameStatus.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="Models\PipeModel.cs" />
     <Compile Include="Models\SurfaceModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\PositionChangedEventArgs.cs" />
-    <Compile Include="Message\RemoveSurfaceMessage.cs" />
-    <Compile Include="ViewModels\UnitType.cs" />
+    <Compile Include="Messages\RemoveSurfaceMessage.cs" />
+    <Compile Include="Models\UnitType.cs" />
     <Compile Include="ViewModels\UnitViewModel.cs" />
     <Compile Include="Models\Vertices.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
@@ -114,7 +117,7 @@
     <Compile Include="VolumeMeterUserControl.xaml.cs">
       <DependentUpon>VolumeMeterUserControl.xaml</DependentUpon>
     </Compile>
-    <Page Include="AudioMenu.xaml">
+    <Page Include="Views\AudioMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -122,7 +125,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainMenu.xaml">
+    <Page Include="Views\InGameMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -138,11 +145,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UnitUserControl.xaml">
+    <Page Include="Views\UnitUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ScoreUserControl.xaml">
+    <Page Include="Views\ScoreUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

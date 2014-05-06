@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace ShoutyBird
+namespace ShoutyBird.Views
 {
     /// <summary>
     /// Interaction logic for MainMenu.xaml

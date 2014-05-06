@@ -6,6 +6,7 @@ using System.Timers;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
 using ShoutyBird.Message;
+using ShoutyBird.Messages;
 using ShoutyBird.ViewModels;
 using Timer = System.Timers.Timer;
 

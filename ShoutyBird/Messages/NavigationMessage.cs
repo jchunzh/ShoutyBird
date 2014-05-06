@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Security.Cryptography;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 
-namespace ShoutyBird.Message
+namespace ShoutyBird.Messages
 {
     public class NavigationMessage : MessageBase
     {

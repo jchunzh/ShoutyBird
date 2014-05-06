@@ -1,6 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
 
-namespace ShoutyBird.Message
+namespace ShoutyBird.Messages
 {
     public class AudioVolumnMessage : MessageBase
     {

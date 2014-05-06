@@ -7,6 +7,7 @@ using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 using ShoutyBird.Message;
+using ShoutyBird.Messages;
 using ShoutyBird.Models;
 using Timer = System.Windows.Forms.Timer;
 

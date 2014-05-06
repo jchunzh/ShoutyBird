@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using ShoutyBird.Message;
+using ShoutyBird.Messages;
 
 namespace ShoutyBird.ViewModels
 {

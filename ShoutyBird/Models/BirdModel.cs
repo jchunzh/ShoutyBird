@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ShoutyBird.Message;
 using ShoutyBird.ViewModels;
-using Action = ShoutyBird.ViewModels.Action;
+using Action = ShoutyBird.Models.Action;
 
 namespace ShoutyBird.Models
 {

@@ -1,5 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
-using ShoutyBird.ViewModels;
+using ShoutyBird.Models;
 
 namespace ShoutyBird.Message
 {

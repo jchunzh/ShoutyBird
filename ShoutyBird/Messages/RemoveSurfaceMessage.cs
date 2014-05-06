@@ -1,7 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
 using ShoutyBird.Models;
 
-namespace ShoutyBird.Message
+namespace ShoutyBird.Messages
 {
     public class RemoveSurfaceMessage : MessageBase
     {

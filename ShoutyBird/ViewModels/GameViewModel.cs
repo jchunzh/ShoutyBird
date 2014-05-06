@@ -56,6 +56,10 @@ namespace ShoutyBird.ViewModels
         private readonly double _screenHeight;
         private readonly double _scale;
 
+        private int _score;
+        private float _volumn;
+        private InGameMenuViewModel _menu;
+
         public ObservableCollection<UnitViewModel> UnitViewModelCollection
         {
             get { return _unitViewModelCollection; }
@@ -87,6 +91,19 @@ namespace ShoutyBird.ViewModels
                 _volumn = value;
 
                 RaisePropertyChanged("Volumn");
+            }
+        }
+
+        public InGameMenuViewModel Menu
+
+        {
+            get { return _menu; }
+            set
+            {
+                if (Equals(_menu, value)) return;
+                _menu = value;
+
+                RaisePropertyChanged("Menu");
             }
         }
 
@@ -140,6 +157,7 @@ namespace ShoutyBird.ViewModels
             Messenger.Default.Register<StartGameMessage>(this, StartGame);
             Messenger.Default.Register<SetGameStatusMessage>(this, SetGameStatus);
             Messenger.Default.Register<KeyDownMessage>(this, KeyDownMessageRecieved);
+            Menu = new InGameMenuViewModel();
         }
 
         private void KeyDownMessageRecieved(KeyDownMessage obj)
@@ -197,9 +215,6 @@ namespace ShoutyBird.ViewModels
             }
         }
 
-        private int _score;
-        private float _volumn;
-
         private void Tick(object state, EventArgs e)
         {
             Score = _world.Score;
@@ -256,6 +271,7 @@ namespace ShoutyBird.ViewModels
         private void Pause()
         {
             _world.PauseSimulation();
+            Menu.ShowMenu();
         }
 
         private void Resume()

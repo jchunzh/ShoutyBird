@@ -16,6 +16,7 @@
              DataContext="{Binding Game, Source={StaticResource Locator}}">
     <UserControl.Resources>
         <converters:PositionToMarginConverter x:Key="PositionToMarginConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid>
         <Canvas x:Name="BackgroundCanvas" Background="LightSkyBlue">
@@ -36,6 +37,6 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Canvas>
-        
+        <views:InGameMenu DataContext="{Binding Menu}" Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </Grid>
 </UserControl>

@@ -2,5 +2,28 @@
              xmlns:viewModels="clr-namespace:ShoutyBird.ViewModels">
   <Application.Resources>
     <viewModels:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
-  </Application.Resources>
+    <Style TargetType="Button">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Width" Value="100"/>
+        <Setter Property="Padding" Value="0 10"/>
+        <Setter Property="Margin" Value="0 0 0 8"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border BorderBrush="Black" BorderThickness="1" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" Margin="{TemplateBinding Margin}" CornerRadius="3">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#FF9872"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#B23A09"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    </Application.Resources>
 </Application>

@@ -35,6 +35,6 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Canvas>
-        <views:InGameMenu DataContext="{Binding Menu}" Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <views:InGameMenu DataContext="{Binding Menu}" Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalAlignment="Center"/>
     </Grid>
 </UserControl>

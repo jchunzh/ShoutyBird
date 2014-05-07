@@ -52,8 +52,11 @@ namespace ShoutyBird.ViewModels
             NavigateBack = new RelayCommand(() => Messenger.Default.Send(new NavigateBackMessage()));
             GetAudioDevices();
 
+            if (DeviceCollection.Count == 0)
+                throw new NotImplementedException("No audio input device detect. Input device required");
+
             _waveIn.DataAvailable += SampleAudio;
-            _waveIn.StartRecording();
+            SelectedDevice = DeviceCollection[0];
         }
 
         private void SampleAudio(object sender, WaveInEventArgs e)

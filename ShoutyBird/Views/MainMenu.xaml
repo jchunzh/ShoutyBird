@@ -6,11 +6,19 @@
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300"
       DataContext="{Binding MainMenu, Source={StaticResource Locator}}">
-
-    <Grid>
-        <StackPanel Orientation="Vertical">
-            <Button Content="Start" Command="{Binding NavigateToGame}"/>
-            <Button Content="Audio" Command="{Binding NavigateToAudio}"></Button>
-        </StackPanel>
+    <Grid HorizontalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Vertical" VerticalAlignment="Center">
+                <Button Content="Start" Command="{Binding NavigateToGame}"/>
+                <Button Content="Audio" Command="{Binding NavigateToAudio}"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

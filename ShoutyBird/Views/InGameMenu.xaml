@@ -12,9 +12,15 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <StackPanel Orientation="Vertical">
-            <Button Content="Resume" Command="{Binding ResumeGame}" Padding="20 5"/>
-            <Button Content="Quit" Command="{Binding ExitGame}" Padding="20 5"/>
-        </StackPanel>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Vertical" VerticalAlignment="Center">
+                <Button Content="Resume" Command="{Binding ResumeGame}"/>
+                <Button Content="Quit" Command="{Binding ExitGame}"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
